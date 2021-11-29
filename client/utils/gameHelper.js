@@ -1,7 +1,7 @@
 import { ARENA_HEIGHT, ARENA_WIDTH } from './constants';
 
 // 'A' => Arena, 'P' => Player
-export const createArena = () => Array.from(Array(ARENA_HEIGHT), () => new Array(ARENA_WIDTH).fill(['0', 'A']));
+export const createArena = () => Array.from(Array(ARENA_HEIGHT), () => Array(ARENA_WIDTH).fill(['0', 'A']));
 
 export const checkCollision = (arena, player, { x: moveX, y: moveY }) => {
   for (let y = 0; y < player.tetromino.length; y++) {

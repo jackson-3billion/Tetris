@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 
-const useAnimationFrame = (callback, _delay) => {
-  const [started, setStarted] = useState(false);
+const useAnimationFrame = (callback, _delay, playing) => {
   const [delay, setDelay] = useState(_delay);
   const timeRef = useRef(0);
   const counterRef = useRef(0);
@@ -24,14 +23,14 @@ const useAnimationFrame = (callback, _delay) => {
       }
       requestIdRef.current = requestAnimationFrame(update);
     };
-    if (started) {
+    if (playing) {
       requestIdRef.current = requestAnimationFrame(update);
     }
 
     return () => cancelAnimationFrame(requestIdRef.current);
-  }, [delay, started]);
+  }, [delay, playing]);
 
-  return [delay, setDelay, setStarted, requestIdRef];
+  return [delay, setDelay, requestIdRef];
 };
 
 export default useAnimationFrame;
