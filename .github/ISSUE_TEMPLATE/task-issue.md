@@ -12,9 +12,9 @@ Group: `client`
 Type: `feature`
 
 ### TODO
-[ ] Job1
-[ ] Job2
-[ ] Job3
+- [ ] Job1
+- [ ] Job2
+- [ ] Job3
 
 ### Estimated time
 `3h`
