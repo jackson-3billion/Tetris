@@ -12,6 +12,9 @@ const useAnimationFrame = (callback, _delay, playing) => {
   }, [callback]);
 
   useEffect(() => {
+    if (!playing) {
+      return;
+    }
     const update = (time = 0) => {
       const timeDiff = time - timeRef.current;
       counterRef.current += timeDiff;
@@ -23,9 +26,8 @@ const useAnimationFrame = (callback, _delay, playing) => {
       }
       requestIdRef.current = requestAnimationFrame(update);
     };
-    if (playing) {
-      requestIdRef.current = requestAnimationFrame(update);
-    }
+
+    requestIdRef.current = requestAnimationFrame(update);
 
     return () => cancelAnimationFrame(requestIdRef.current);
   }, [delay, playing]);
