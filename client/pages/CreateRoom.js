@@ -6,9 +6,11 @@ import { v4 as uuid } from 'uuid';
 import useInput from '@hooks/useInput';
 import useValidate from '@hooks/useValidate';
 
+import { nicknameValidator } from '@utils/validate';
+
 const CreateRoom = () => {
   const [nickname, handleInputChange] = useInput('');
-  const [isValid, msg] = useValidate(nickname);
+  const [isValid, msg] = useValidate(nickname, nicknameValidator);
   const navigate = useNavigate();
 
   const handleSubmit = (e) => {
@@ -26,7 +28,9 @@ const CreateRoom = () => {
     <Wrapper onSubmit={handleSubmit}>
       <InnerWrapper>
         <input value={nickname} onChange={handleInputChange} placeholder="닉네임을 입력해 주세요." />
-        <Warning isValid={isValid}>{msg}</Warning>
+        <Warning visible={!!nickname.length} isValid={isValid}>
+          {msg}
+        </Warning>
       </InnerWrapper>
       <button disabled={!isValid}>방 만들기</button>
       <Home onClick={handleClickHome}>처음으로</Home>
@@ -79,6 +83,7 @@ const Warning = styled.div`
   margin-top: 3px;
   padding-left: 10px;
   font-size: 0.9rem;
+  visibility: ${({ visible }) => (visible ? 'visible' : 'hidden')};
 `;
 
 const Home = styled.div`
