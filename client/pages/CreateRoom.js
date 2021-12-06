@@ -8,20 +8,20 @@ import useValidate from '@hooks/useValidate';
 
 import { nicknameValidator } from '@utils/validate';
 
+import Home from '@components/Home';
+
 const CreateRoom = () => {
   const [nickname, handleInputChange] = useInput('');
   const [isValid, msg] = useValidate(nickname, nicknameValidator);
   const navigate = useNavigate();
+
+  const handleClickHome = () => navigate('/');
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (isValid) {
       navigate(`/game/${uuid()}`, { state: nickname.trim() });
     }
-  };
-
-  const handleClickHome = () => {
-    navigate('/');
   };
 
   return (
@@ -32,8 +32,8 @@ const CreateRoom = () => {
           {msg}
         </Warning>
       </InnerWrapper>
-      <button disabled={!isValid}>방 만들기</button>
-      <Home onClick={handleClickHome}>처음으로</Home>
+      <button disabled={!isValid}>Create Game</button>
+      <Home onClick={handleClickHome} />
     </Wrapper>
   );
 };
@@ -56,15 +56,23 @@ const Wrapper = styled.form`
     border: none;
     border-radius: 5px;
     font-size: 1.2rem;
-    background-color: #d5cabd;
+    background-color: #d2aa87; //#d5cabd;
+
     &:hover {
       cursor: pointer;
+    }
+
+    @media all and (max-width: 600px) {
+      width: 90%;
+      margin-top: 0.5rem;
     }
   }
 `;
 
 const InnerWrapper = styled.div`
   width: 30%;
+  min-width: 250px;
+
   & > input {
     width: 100%;
     height: 3rem;
@@ -72,26 +80,21 @@ const InnerWrapper = styled.div`
     font-size: 1.2rem;
     border: none;
     border-radius: 5px;
+
     &:focus {
       outline: none;
     }
   }
+
+  @media all and (max-width: 600px) {
+    width: 90%;
+  }
 `;
 
 const Warning = styled.div`
-  color: ${({ isValid }) => (isValid ? '#07bc0c' : '#e74c3c')};
   margin-top: 3px;
   padding-left: 10px;
   font-size: 0.9rem;
+  color: ${({ isValid }) => (isValid ? '#07bc0c' : '#e74c3c')};
   visibility: ${({ visible }) => (visible ? 'visible' : 'hidden')};
-`;
-
-const Home = styled.div`
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  &:hover {
-    cursor: pointer;
-  }
-  // make as layout component
 `;
