@@ -1,48 +1,55 @@
 import React from 'react';
-import { useNavigate } from 'react-router';
 import styled from '@emotion/styled';
 import { v4 as uuid } from 'uuid';
+import { useNavigate } from 'react-router';
 
 import useInput from '@hooks/useInput';
 import useValidate from '@hooks/useValidate';
 
-import { nicknameValidator } from '@utils/validate';
-
 import Home from '@components/Home';
 
+import { nicknameValidator } from '@utils/validate';
+
 const CreateRoom = () => {
-  const [nickname, handleInputChange] = useInput('');
-  const [isValid, msg] = useValidate(nickname, nicknameValidator);
   const navigate = useNavigate();
+  const [nickname, handleNicknameChange] = useInput('');
+  const [isValid, msg] = useValidate(nickname, nicknameValidator);
 
-  const handleClickHome = () => navigate('/');
-
-  const handleSubmit = (e) => {
+  const handleCreateRoom = (e) => {
     e.preventDefault();
     if (isValid) {
-      navigate(`/game/${uuid()}`, { state: nickname.trim() });
+      navigate(`/game/${uuid()}`, { state: nickname });
     }
   };
 
   return (
-    <Wrapper onSubmit={handleSubmit}>
-      <InnerWrapper>
-        <input value={nickname} onChange={handleInputChange} placeholder="닉네임을 입력해 주세요." />
-        <Warning visible={!!nickname.length} isValid={isValid}>
-          {msg}
-        </Warning>
-      </InnerWrapper>
-      <button disabled={!isValid}>Create Game</button>
-      <Home onClick={handleClickHome} />
+    <Wrapper>
+      <Form onSubmit={handleCreateRoom}>
+        <InputWrapper>
+          <input value={nickname} onChange={handleNicknameChange} placeholder="닉네임을 입력해주세요." />
+          <Warning visible={!!nickname.length} isValid={isValid}>
+            {msg}
+          </Warning>
+        </InputWrapper>
+        <button disabled={!isValid}>Create Game</button>
+      </Form>
+      <Home />
     </Wrapper>
   );
 };
 
 export default CreateRoom;
 
-const Wrapper = styled.form`
+const Wrapper = styled.div`
   height: 100vh;
   background-color: #e9eaed;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+const Form = styled.form`
+  width: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -56,10 +63,18 @@ const Wrapper = styled.form`
     border: none;
     border-radius: 5px;
     font-size: 1.2rem;
-    background-color: #d2aa87; //#d5cabd;
+    background-color: #d2aa87;
+    box-shadow: 10px 10px 14px 1px rgb(0 0 0 / 20%);
+    transition: all 0.3s ease-in;
 
-    &:hover {
+    &:hover:disabled {
+      cursor: not-allowed;
+    }
+
+    &:hover:not(:disabled) {
       cursor: pointer;
+      box-shadow: none;
+      transition: all 0.3s ease-in;
     }
 
     @media all and (max-width: 600px) {
@@ -69,7 +84,7 @@ const Wrapper = styled.form`
   }
 `;
 
-const InnerWrapper = styled.div`
+const InputWrapper = styled.div`
   width: 30%;
   min-width: 250px;
 
