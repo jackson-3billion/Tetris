@@ -5,21 +5,24 @@ import { useNavigate } from 'react-router';
 import useInput from '@hooks/useInput';
 import useValidate from '@hooks/useValidate';
 
-import Home from '@components/Home';
-
 import { nicknameValidator } from '@utils/validate';
 
 const JoinRoom = () => {
   const navigate = useNavigate();
   const [nickname, handleNicknameChange] = useInput('');
-  const [isValid, msg] = useValidate(nickname, nicknameValidator);
+  const [isValidNickname, msg] = useValidate(nickname, nicknameValidator);
   const [gameRoomId, handleGameRoomIdChange] = useInput('');
 
   const handleJoinRoom = (e) => {
     e.preventDefault();
-    if (isValid) {
-      navigate(`/game/${gameRoomId}`, { state: nickname });
+    if (!isValidNickname) {
+      return;
     }
+    // server 로 axios 요청 => gameRoomId로 만들어진 방의 존재여부 확인
+    // false => modal => "존재하지 않는 gameRoom 입니다"
+    // true => navigate
+
+    navigate(`/game/${gameRoomId}`, { state: nickname });
   };
 
   return (
@@ -27,14 +30,13 @@ const JoinRoom = () => {
       <Form onSubmit={handleJoinRoom}>
         <InputWrapper>
           <input value={nickname} onChange={handleNicknameChange} placeholder="Nickname" />
-          <Warning visible={!!nickname.length} isValid={isValid}>
+          <Warning visible={!!nickname.length} isValid={isValidNickname}>
             {msg}
           </Warning>
           <input value={gameRoomId} onChange={handleGameRoomIdChange} placeholder="Room ID" />
         </InputWrapper>
-        <button disabled={!isValid || !gameRoomId.length}>Join Game</button>
+        <button disabled={!isValidNickname || !gameRoomId.length}>Join Game</button>
       </Form>
-      <Home />
     </Wrapper>
   );
 };
