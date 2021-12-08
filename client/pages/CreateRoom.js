@@ -6,18 +6,16 @@ import { useNavigate } from 'react-router';
 import useInput from '@hooks/useInput';
 import useValidate from '@hooks/useValidate';
 
-import Home from '@components/Home';
-
 import { nicknameValidator } from '@utils/validate';
 
 const CreateRoom = () => {
   const navigate = useNavigate();
   const [nickname, handleNicknameChange] = useInput('');
-  const [isValid, msg] = useValidate(nickname, nicknameValidator);
+  const [isValidNickname, msg] = useValidate(nickname, nicknameValidator);
 
   const handleCreateRoom = (e) => {
     e.preventDefault();
-    if (isValid) {
+    if (isValidNickname) {
       navigate(`/game/${uuid()}`, { state: nickname });
     }
   };
@@ -27,13 +25,12 @@ const CreateRoom = () => {
       <Form onSubmit={handleCreateRoom}>
         <InputWrapper>
           <input value={nickname} onChange={handleNicknameChange} placeholder="닉네임을 입력해주세요." />
-          <Warning visible={!!nickname.length} isValid={isValid}>
+          <Warning visible={!!nickname.length} isValid={isValidNickname}>
             {msg}
           </Warning>
         </InputWrapper>
-        <button disabled={!isValid}>Create Game</button>
+        <button disabled={!isValidNickname}>Create Game</button>
       </Form>
-      <Home />
     </Wrapper>
   );
 };
