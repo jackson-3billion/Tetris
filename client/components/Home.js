@@ -1,18 +1,22 @@
-import React from 'react';
+import React, { useCallback, memo } from 'react';
 import styled from '@emotion/styled';
+import { useNavigate } from 'react-router';
 
 import { IoIosHome } from 'react-icons/io';
 import { lighten } from 'polished';
 
-const Home = ({ style = {}, onClick }) => {
+const Home = ({ style = {} }) => {
+  const navigate = useNavigate();
+  const handleClickHome = useCallback(() => navigate('/'), [navigate]);
+
   return (
-    <HomeWrapper onClick={onClick} {...style}>
+    <HomeWrapper onClick={handleClickHome} {...style}>
       <IoIosHome size={'100%'} />
     </HomeWrapper>
   );
 };
 
-export default Home;
+export default memo(Home);
 
 const HomeWrapper = styled.div`
   width: ${({ width }) => width || '4%'};
