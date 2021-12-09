@@ -1,6 +1,5 @@
 import React from 'react';
 import styled from '@emotion/styled';
-import { v4 as uuid } from 'uuid';
 import { useNavigate } from 'react-router';
 
 import useInput from '@hooks/useInput';
@@ -8,34 +7,41 @@ import useValidate from '@hooks/useValidate';
 
 import { nicknameValidator } from '@utils/validate';
 
-const CreateRoom = () => {
+const JoinRoom = () => {
   const navigate = useNavigate();
   const [nickname, handleNicknameChange] = useInput('');
   const [isValidNickname, msg] = useValidate(nickname, nicknameValidator);
+  const [gameRoomId, handleGameRoomIdChange] = useInput('');
 
-  const handleCreateRoom = (e) => {
+  const handleJoinRoom = (e) => {
     e.preventDefault();
-    if (isValidNickname) {
-      navigate(`/game/${uuid()}`, { state: nickname });
+    if (!isValidNickname) {
+      return;
     }
+    // server 로 axios 요청 => gameRoomId로 만들어진 방의 존재여부 확인
+    // false => modal => "존재하지 않는 gameRoom 입니다"
+    // true => navigate
+
+    navigate(`/game/${gameRoomId}`, { state: nickname });
   };
 
   return (
     <Wrapper>
-      <Form onSubmit={handleCreateRoom}>
+      <Form onSubmit={handleJoinRoom}>
         <InputWrapper>
-          <input value={nickname} onChange={handleNicknameChange} placeholder="닉네임을 입력해주세요." />
+          <input value={nickname} onChange={handleNicknameChange} placeholder="Nickname" />
           <Warning visible={!!nickname.length} isValid={isValidNickname}>
             {msg}
           </Warning>
+          <input value={gameRoomId} onChange={handleGameRoomIdChange} placeholder="Room ID" />
         </InputWrapper>
-        <button disabled={!isValidNickname}>Create Game</button>
+        <button disabled={!isValidNickname || !gameRoomId.length}>Join Game</button>
       </Form>
     </Wrapper>
   );
 };
 
-export default CreateRoom;
+export default JoinRoom;
 
 const Wrapper = styled.div`
   height: 100vh;
@@ -76,7 +82,7 @@ const Form = styled.form`
 
     @media all and (max-width: 600px) {
       width: 90%;
-      margin-top: 0.5rem;
+      margin-top: 2.5rem;
     }
   }
 `;
@@ -104,7 +110,7 @@ const InputWrapper = styled.div`
 `;
 
 const Warning = styled.div`
-  margin-top: 3px;
+  margin: 3px 0px 1rem;
   padding-left: 10px;
   font-size: 0.9rem;
   color: ${({ isValid }) => (isValid ? '#07bc0c' : '#e74c3c')};
