@@ -1,7 +1,14 @@
+require('dotenv').config();
 const app = require('express')();
 const http = require('http');
 const server = http.createServer(app);
 const { Server } = require('socket.io');
+
+//const db = require('./db');
+// db.query('select * from player', (_, rows) => {
+//   console.log(rows);
+// });
+
 const io = new Server(server, {
   cors: {
     origin: 'http://localhost:3090',
@@ -35,9 +42,9 @@ io.on('connection', socket => {
       io.to(gameRoomId).emit('start', 'game will start in 5 secs');
     }
 
-    socket.on('counter-change', counter => {
-      socket.broadcast.to(gameRoomId).emit('opponent-change', {
-        counter,
+    socket.on('arena-updated', arena => {
+      socket.broadcast.to(gameRoomId).emit('arena-updated', {
+        arena,
       });
     });
 
