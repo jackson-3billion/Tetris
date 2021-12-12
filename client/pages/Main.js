@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import styled from '@emotion/styled';
+import { darken } from 'polished';
 
 import { rankList } from '@utils/dummy';
 
@@ -12,7 +13,7 @@ const Main = () => {
       <Title>Tetris </Title>
       <RankList>
         {rankList.map(({ score, nickname }, idx) => (
-          <RankItem>
+          <RankItem key={idx}>
             <Rank>
               <span>{idx + 1}</span>
               <span>{ordinalMapper[idx]}</span>
@@ -37,7 +38,6 @@ const Main = () => {
 export default Main;
 
 const Wrapper = styled.div`
-  border: 1px solid green;
   height: 100vh;
   display: flex;
   flex-direction: column;
@@ -50,17 +50,14 @@ const Wrapper = styled.div`
 const Title = styled.div`
   margin-top: -10%;
   font-size: 10rem;
-  border: 1px solid crimson;
 `;
 
 const RankList = styled.div`
-  //border: 1px solid purple;
   width: 20%;
   min-width: 300px;
 `;
 
 const RankItem = styled.div`
-  //border: 1px solid salmon;
   display: flex;
   justify-content: space-evenly;
   font-size: 2rem;
@@ -69,7 +66,7 @@ const RankItem = styled.div`
 
 const Rank = styled.span`
   flex-basis: 20%;
-  //border: 1px solid yellow;
+  text-align: left;
   & > span:nth-of-type(2) {
     font-size: 1.5rem;
   }
@@ -77,33 +74,39 @@ const Rank = styled.span`
 
 const Score = styled.span`
   flex-basis: 40%;
-  //border: 1px solid yellow;
 `;
 
 const Nickname = styled.span`
   flex-basis: 40%;
-  //border: 1px solid yellow;
 `;
 
 const Buttons = styled.div`
-  border: 2px solid green;
   margin-top: 2rem;
   display: flex;
   justify-content: space-between;
-  //min-width: 300px;
-  min-width: 250px;
+  min-width: 350px;
+  @media all and (max-width: 600px) {
+    width: 100%;
+    padding: 0 1rem;
+  }
 `;
 
 const LinkButton = styled(Link)`
-  flex-basis: 3rem;
-  min-width: 100px;
+  min-width: 150px;
   text-align: center;
   text-decoration: none;
   color: white;
-  //border: 1px solid orange;
   border-radius: 5px;
-  padding: 0.5rem 1rem;
+  padding: 0.3rem;
   font-size: 1.5rem;
   font-weight: bold;
   background-color: ${({ color }) => color};
+
+  &:hover {
+    background-color: ${({ color }) => darken(0.1, color)};
+  }
+
+  @media all and (max-width: 600px) {
+    width: 48%;
+  }
 `;
