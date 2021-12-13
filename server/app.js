@@ -18,9 +18,7 @@ const io = new Server(server, {
 const PORT = 9000;
 
 io.on('connection', socket => {
-  console.log('connected');
-
-  socket.on('enter', gameRoomId => {
+  socket.on('join', gameRoomId => {
     let playerNum = getPlayerNum(io, gameRoomId);
 
     if (playerNum === 2) {
@@ -28,27 +26,28 @@ io.on('connection', socket => {
       return;
     }
 
-    console.log('entered');
-    const data = '';
     socket.join(gameRoomId);
     ++playerNum;
-    console.log(io.sockets.adapter.rooms.get(gameRoomId));
+    socket.emit('joined', playerNum);
+    //console.log(io.sockets.adapter.rooms.get(gameRoomId));
 
     if (playerNum === 1) {
       socket.emit('waiting', 'waiting for another player to join');
     }
 
     if (playerNum === 2) {
-      io.to(gameRoomId).emit('start', 'game will start in 5 secs');
+      io.to(gameRoomId).emit('isTwoPlayer', 'press start to play Tetris!');
     }
+
+    socket.on('nickname', nickname => {
+      socket.broadcast.to(gameRoomId).emit('nickname', nickname);
+    });
 
     socket.on('arena-updated', arena => {
       socket.broadcast.to(gameRoomId).emit('arena-updated', {
         arena,
       });
     });
-
-    socket.emit('init', data);
 
     socket.on('disconnect', () => {
       console.log(getPlayerNum(io, gameRoomId));
@@ -59,11 +58,8 @@ io.on('connection', socket => {
 
 const getPlayerNum = (io, roomId) => {
   const joinedPlayers = io.sockets.adapter.rooms.get(roomId);
-  console.log(joinedPlayers);
-  if (!joinedPlayers) {
-    return 0;
-  }
-  return joinedPlayers.size;
+
+  return joinedPlayers ? joinedPlayers.size : 0;
 };
 
 server.listen(PORT, () => console.log(`listening on port: ${PORT}`));
