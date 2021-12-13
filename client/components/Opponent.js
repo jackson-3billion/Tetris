@@ -10,17 +10,17 @@ import { createArena } from '@utils/gameHelper';
 
 const Opponent = ({ socketRef, opponentNickname }) => {
   const [arena, setArena] = useState(createArena());
-  const mountedRef = useMounted();
+  const mounted = useMounted();
 
   useEffect(() => {
     if (socketRef?.current) {
       const socket = socketRef.current;
       socket.on('arena-updated', ({ arena: newArena }) => {
-        if (!mountedRef.current) return;
+        if (!mounted) return;
         setArena(newArena);
       });
     }
-  }, [socketRef, mountedRef]);
+  }, [socketRef, mounted]);
 
   return (
     <TetrisWrapper>

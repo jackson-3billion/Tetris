@@ -1,15 +1,15 @@
-import { useRef, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
 const useMounted = () => {
-  const mountedRef = useRef(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    mountedRef.current = true;
+    setMounted(true);
 
-    return () => (mountedRef.current = false);
+    return () => setMounted(false);
   }, []);
 
-  return mountedRef;
+  return mounted;
 };
 
 export default useMounted;
