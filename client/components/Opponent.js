@@ -1,27 +1,33 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import styled from '@emotion/styled';
 
 import Arena from '@components/Arena';
 import Display from '@components/Display';
 
+import useMounted from '@hooks/useMounted';
+
 import { createArena } from '@utils/gameHelper';
 
-const Opponent = ({ socketRef }) => {
+const Opponent = ({ socketRef, opponentNickname }) => {
   const [arena, setArena] = useState(createArena());
+  const mountedRef = useMounted();
 
   useEffect(() => {
     if (socketRef?.current) {
       const socket = socketRef.current;
-      socket.on('arena-updated', ({ arena: newArena }) => setArena(newArena));
+      socket.on('arena-updated', ({ arena: newArena }) => {
+        if (!mountedRef.current) return;
+        setArena(newArena);
+      });
     }
-  }, [socketRef]);
+  }, [socketRef, mountedRef]);
 
   return (
     <TetrisWrapper>
       <TetrisGame>
         <Arena arena={arena} />
         <aside>
-          <Display text="opponent" />
+          <Display text={opponentNickname ? opponentNickname : 'waiting'} />
         </aside>
       </TetrisGame>
     </TetrisWrapper>
