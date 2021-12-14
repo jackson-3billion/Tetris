@@ -15,7 +15,7 @@ const Opponent = ({ socketRef, opponentNickname }) => {
   useEffect(() => {
     if (socketRef?.current) {
       const socket = socketRef.current;
-      socket.on('arena-updated', ({ arena: newArena }) => {
+      socket.on('arena-updated', (newArena) => {
         if (!mounted) return;
         setArena(newArena);
       });

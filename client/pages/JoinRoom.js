@@ -10,8 +10,8 @@ import { nicknameValidator } from '@utils/validate';
 const JoinRoom = () => {
   const navigate = useNavigate();
   const [nickname, handleNicknameChange] = useInput('');
-  const [isValidNickname, msg] = useValidate(nickname, nicknameValidator);
   const [gameRoomId, handleGameRoomIdChange] = useInput('');
+  const [isValidNickname, msg] = useValidate(nickname, nicknameValidator);
 
   const handleJoinRoom = (e) => {
     e.preventDefault();
