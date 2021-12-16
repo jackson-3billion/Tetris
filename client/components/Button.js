@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import styled from '@emotion/styled';
 
 const Button = ({ text, callback, color }) => {
@@ -9,7 +9,7 @@ const Button = ({ text, callback, color }) => {
   );
 };
 
-export default Button;
+export default memo(Button);
 
 const StyledButton = styled.button`
   margin: 0 0 20px 0;
