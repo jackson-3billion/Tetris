@@ -6,7 +6,7 @@ const Timer = ({ started, paused }) => {
   const timerIdRef = useRef();
 
   useEffect(() => {
-    if (started) {
+    if (started && !paused) {
       timerIdRef.current = setInterval(() => {
         setTime(({ min, sec }) => {
           if (++sec === 60) {
@@ -16,12 +16,12 @@ const Timer = ({ started, paused }) => {
           return { min, sec };
         });
       }, 1000);
-    } else {
-      clearTimeout(timerIdRef.current);
+      return;
     }
+    clearTimeout(timerIdRef.current);
 
     return () => clearTimeout(timerIdRef.current);
-  }, [started]);
+  }, [started, paused]);
 
   return (
     <TimerBox>
