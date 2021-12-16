@@ -3,7 +3,6 @@ const app = require('express')();
 const http = require('http');
 const server = http.createServer(app);
 const { Server } = require('socket.io');
-const { isRegExp } = require('util');
 
 //const db = require('./db');
 // db.query('select * from player', (_, rows) => {
@@ -51,9 +50,13 @@ io.on('connection', socket => {
       socket.broadcast.to(gameRoomId).emit('isReady', isReady);
     });
 
+    socket.on('start', () => io.to(gameRoomId).emit('start', true));
+
+    socket.on('paused', paused => io.to(gameRoomId).emit('paused', paused));
+
     socket.on('disconnect', () => {
       console.log(getPlayerNum(io, gameRoomId));
-      io.to(gameRoomId).emit('end', 'opponent leaved the room');
+      io.to(gameRoomId).emit('end', 'opponent left the room');
     });
   });
 });
