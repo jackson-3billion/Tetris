@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, memo } from 'react';
 import styled from '@emotion/styled';
 
 import Arena from '@components/Arena';
@@ -34,7 +34,7 @@ const Opponent = ({ socketRef, opponentNickname }) => {
   );
 };
 
-export default Opponent;
+export default memo(Opponent);
 
 const TetrisWrapper = styled.div`
   width: 100vw;
