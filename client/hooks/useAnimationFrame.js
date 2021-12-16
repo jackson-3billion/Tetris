@@ -27,7 +27,7 @@ const useAnimationFrame = (callback, _delay, playing) => {
       requestIdRef.current = requestAnimationFrame(update);
     };
 
-    requestIdRef.current = requestAnimationFrame(update);
+    update();
 
     return () => cancelAnimationFrame(requestIdRef.current);
   }, [delay, playing]);

@@ -15,9 +15,7 @@ const useSocket = (server) => {
   useEffect(() => {
     createSocket();
 
-    return () => {
-      createSocket().disconnect();
-    };
+    return () => createSocket().disconnect();
   }, [createSocket]);
 
   return socketRef;
