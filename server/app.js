@@ -5,9 +5,9 @@ const server = http.createServer(app);
 const { Server } = require('socket.io');
 
 //const db = require('./db');
-// db.query('select * from player', (_, rows) => {
-//   console.log(rows);
-// });
+//db.query('select * from player', (_, rows) => {
+//  console.log(rows);
+//});
 
 const io = new Server(server, {
   cors: {
@@ -22,8 +22,7 @@ io.on('connection', socket => {
     const playerNum = getPlayerNum(io, gameRoomId);
 
     if (playerNum === 2) {
-      socket.emit('full', 'room is full');
-      return;
+      return socket.emit('full', 'room is full');
     }
 
     socket.join(gameRoomId);
@@ -52,11 +51,13 @@ io.on('connection', socket => {
 
     socket.on('start', () => io.to(gameRoomId).emit('start', true));
 
-    socket.on('paused', paused => io.to(gameRoomId).emit('paused', paused));
+    socket.on('paused', () => io.to(gameRoomId).emit('paused', true));
+
+    socket.on('resume', () => io.to(gameRoomId).emit('paused', false));
 
     socket.on('disconnect', () => {
       console.log(getPlayerNum(io, gameRoomId));
-      io.to(gameRoomId).emit('end', 'opponent left the room');
+      socket.broadcast.to(gameRoomId).emit('opponentLeft', 'opponent left the room');
     });
   });
 });
