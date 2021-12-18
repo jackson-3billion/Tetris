@@ -9,20 +9,22 @@ import Arena from '@components/Arena';
 import Display from '@components/Display';
 import Button from '@components/Button';
 
-import { createArena, checkCollision, rotateMatrix } from '@utils/gameHelper';
-import { DROP_FAST, DROP_SLOW, DROP_PAUSED, LEFTWARD, RIGHTWARD, DOWNWARD } from '@utils/constants';
 import colors from '@utils/colors';
+import { createArena, checkCollision, rotateMatrix } from '@utils/gameHelper';
+import { DROP_FAST, DROP_SLOW, DROP_PAUSED, LEFTWARD, RIGHTWARD, DOWNWARD, KEYHOLD_MAX_CNT } from '@utils/constants';
 
 const Tetris = ({ started, setStarted, paused, isHost, isOpponentReady, socketRef }) => {
-  const [isReady, setIsReady] = useState(false);
+  const [isReady, setIsReady] = useState(false); // guest 입장에서 필요 <-> isOpponentReady: host가 필요
   const [player, setPlayer, movePlayer, resetPlayer] = usePlayer();
   const [arena, setArena] = useArena(player, resetPlayer, setStarted);
   const keyHoldCounterRef = useRef(0);
 
   const drop = () => {
     if (checkCollision(arena, player, DOWNWARD)) {
-      setPlayer((prev) => ({ ...prev, collided: true }));
-      return;
+      if (player.pos.y <= 1) {
+        return setStarted(false);
+      }
+      return setPlayer((prev) => ({ ...prev, collided: true }));
     }
     movePlayer(DOWNWARD);
   };
@@ -38,7 +40,6 @@ const Tetris = ({ started, setStarted, paused, isHost, isOpponentReady, socketRe
   }, [started, setArena, resetPlayer]);
 
   useEffect(() => {
-    console.log(`started:${started} / paused:${paused}`);
     if (started && paused) {
       // TODO: save current drop-delat in dropDelayRef
       setDropDelay(DROP_PAUSED);
@@ -80,27 +81,27 @@ const Tetris = ({ started, setStarted, paused, isHost, isOpponentReady, socketRe
     socket.emit('paused', !paused);
   }, [paused, socketRef]);
 
-  const resetDropDelay = ({ key }) => {
-    if (!started) return;
+  const handleKeyUp = ({ key }) => {
+    if (!started || paused) return;
     if (key !== 'ArrowDown') return;
     cancelAnimationFrame(requestIdRef.current);
     setDropDelay(DROP_SLOW);
   };
 
-  const handleKeyHold = (callback, args, maxCnt) => {
-    if (++keyHoldCounterRef.current >= maxCnt) {
+  const handleKeyHold = (callback, args) => {
+    if (++keyHoldCounterRef.current >= KEYHOLD_MAX_CNT) {
       callback(args);
       keyHoldCounterRef.current = 0;
     }
   };
 
   const handleKeyDown = ({ key, repeat }) => {
-    if (!started) return;
+    if (!started || paused) return;
     switch (key) {
       case 'ArrowLeft':
         if (checkCollision(arena, player, LEFTWARD) || player.collided) return;
         if (repeat) {
-          handleKeyHold(movePlayer, LEFTWARD, 3);
+          handleKeyHold(movePlayer, LEFTWARD);
         } else {
           movePlayer(LEFTWARD);
         }
@@ -108,7 +109,7 @@ const Tetris = ({ started, setStarted, paused, isHost, isOpponentReady, socketRe
       case 'ArrowRight':
         if (checkCollision(arena, player, RIGHTWARD) || player.collided) return;
         if (repeat) {
-          handleKeyHold(movePlayer, RIGHTWARD, 3);
+          handleKeyHold(movePlayer, RIGHTWARD);
         } else {
           movePlayer(RIGHTWARD);
         }
@@ -156,7 +157,7 @@ const Tetris = ({ started, setStarted, paused, isHost, isOpponentReady, socketRe
   };
 
   return (
-    <TetrisWrapper role="button" tabIndex="0" onKeyDown={handleKeyDown} onKeyUp={resetDropDelay}>
+    <TetrisWrapper role="button" tabIndex="0" onKeyDown={handleKeyDown} onKeyUp={handleKeyUp}>
       <TetrisGame>
         <Arena arena={arena} />
         <aside>
