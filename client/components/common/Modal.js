@@ -2,14 +2,11 @@ import React from 'react';
 import { createPortal } from 'react-dom';
 import styled from '@emotion/styled';
 
-const Modal = ({ hideModal, children }) => {
+const Modal = ({ children }) => {
   return createPortal(
     <>
-      <Overlay onClick={hideModal} />
-      <ModalContainer>
-        <CloseBtn onClick={hideModal}>&times;</CloseBtn>
-        <Content>{children}</Content>
-      </ModalContainer>
+      <Overlay />
+      <ModalContainer>{children}</ModalContainer>
     </>,
     document.getElementById('modal'),
   );
@@ -43,17 +40,3 @@ const ModalContainer = styled.div`
   z-index: 3;
   box-shadow: 1px 3px 3px 1px rgba(0, 0, 0, 0.2);
 `;
-
-const CloseBtn = styled.div`
-  position: absolute;
-  top: 0;
-  right: 1.5rem;
-  color: #333333;
-  font-size: 3rem;
-  &:hover {
-    cursor: pointer;
-    color: crimson;
-  }
-`;
-
-const Content = styled.div``;
