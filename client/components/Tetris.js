@@ -29,7 +29,7 @@ const Tetris = ({ started, setStarted, paused, isHost, isOpponentReady, socketRe
     movePlayer(DOWNWARD);
   };
 
-  const [dropDelay, setDropDelay, requestIdRef] = useAnimationFrame(drop, DROP_SLOW, started);
+  const [dropDelay, setDropDelay, cancelAnimation] = useAnimationFrame(drop, DROP_SLOW, started);
 
   // 게임 시작 및 재시작
   useEffect(() => {
@@ -40,15 +40,18 @@ const Tetris = ({ started, setStarted, paused, isHost, isOpponentReady, socketRe
   }, [started, setArena, resetPlayer]);
 
   useEffect(() => {
-    if (started && paused) {
-      // TODO: save current drop-delat in dropDelayRef
+    if (!started) return;
+    if (paused) {
+      // TODO: save current drop-delay in dropDelayRef
+      cancelAnimation();
       setDropDelay(DROP_PAUSED);
     }
-    if (started && !paused) {
+    if (!paused) {
       // TODO: restore drop-delay saved in dropDelayRef
+      //cancelAnimation();
       setDropDelay(DROP_SLOW);
     }
-  }, [paused, started, setDropDelay]);
+  }, [paused, started, setDropDelay, cancelAnimation]);
 
   // 사용자의 화면 변경사항을 상대에게 전송
   useEffect(() => {
@@ -84,7 +87,8 @@ const Tetris = ({ started, setStarted, paused, isHost, isOpponentReady, socketRe
   const handleKeyUp = ({ key }) => {
     if (!started || paused) return;
     if (key !== 'ArrowDown') return;
-    cancelAnimationFrame(requestIdRef.current);
+    //cancelAnimationFrame(requestIdRef.current);
+    cancelAnimation();
     setDropDelay(DROP_SLOW);
   };
 
@@ -116,7 +120,8 @@ const Tetris = ({ started, setStarted, paused, isHost, isOpponentReady, socketRe
         break;
       case 'ArrowDown':
         if (dropDelay === DROP_SLOW) {
-          cancelAnimationFrame(requestIdRef.current);
+          //cancelAnimationFrame(requestIdRef.current);
+          cancelAnimation();
           setDropDelay(DROP_FAST);
         }
         break;
@@ -163,7 +168,9 @@ const Tetris = ({ started, setStarted, paused, isHost, isOpponentReady, socketRe
         <aside>
           <Display text={started ? 'playing' : 'game over'} />
           <Button callback={handleButtonClick} text={getButtonText()} color={getButtonColor()} />
-          <Button callback={handlePause} text={paused ? 'resume' : 'pause'} color={paused ? 'salmon' : 'blue'} />
+          {started && (
+            <Button callback={handlePause} text={paused ? 'resume' : 'pause'} color={paused ? 'salmon' : 'blue'} />
+          )}
         </aside>
       </TetrisGame>
     </TetrisWrapper>

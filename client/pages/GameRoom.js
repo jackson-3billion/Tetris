@@ -72,7 +72,6 @@ const GameRoom = () => {
       {isGameOverModalOpen && <GameOverModal>GAME OVER</GameOverModal>}
       {isPauseModalOpen && (
         <PauseModal>
-          {/* <ModalMsg>PAUSED</ModalMsg> */}
           <Button text="RESUME" callback={handleResume} color="salmon" />
         </PauseModal>
       )}
