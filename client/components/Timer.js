@@ -34,7 +34,9 @@ const Timer = ({ started, paused }) => {
 
 export default Timer;
 
-const TimerBox = styled.div``;
+const TimerBox = styled.div`
+  position: absolute;
+`;
 
 const Minutes = styled.span``;
 
