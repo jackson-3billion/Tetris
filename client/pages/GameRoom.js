@@ -18,15 +18,12 @@ const GameRoom = () => {
   const [isGameOverModalOpen, openGameOverModal, hideGameOverModal, GameOverModal] = useModal();
   const [isPauseModalOpen, openPauseModal, hidePauseModal, PauseModal] = useModal();
 
-  const [state, dispatch] = useReducer(reducer, initialState);
-  const { joined, started, paused, isHost, isReady, isGameOver, opponentNickname } = state;
+  const [gameState, dispatch] = useReducer(reducer, initialState);
+  const { joined, started, paused, isHost, isReady, isGameOver, opponentNickname } = gameState;
 
   const handleStateChange = useCallback((k) => (v) => dispatch({ payload: { [k]: v } }), []);
 
-  const handleResume = () => {
-    const socket = socketRef?.current;
-    socket.emit('resume');
-  };
+  const handleResume = () => socketRef?.current?.emit('resume');
 
   useEffect(() => {
     if (!socketRef?.current) return;
