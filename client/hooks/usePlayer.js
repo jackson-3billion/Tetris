@@ -6,7 +6,7 @@ import { PLAYER_INITIAL_POS } from '@utils/constants';
 const usePlayer = () => {
   const [player, setPlayer] = useState({
     pos: PLAYER_INITIAL_POS,
-    tetromino: TETROMINOS['0'].shape,
+    tetromino: TETROMINOS['0'],
     collided: false,
   });
 
@@ -23,7 +23,7 @@ const usePlayer = () => {
   const resetPlayer = useCallback(() => {
     setPlayer({
       pos: { ...PLAYER_INITIAL_POS },
-      tetromino: randomTetromino().shape,
+      tetromino: randomTetromino(),
       collided: false,
     });
   }, []);
