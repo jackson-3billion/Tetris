@@ -14,10 +14,10 @@ const itemMapper = {
   slower: <FaBackward color="crimson" size="90%" />,
 };
 
-export const Cell = ({ type, item, exploding }) => {
+export const Cell = ({ type, item, sparkling }) => {
   return (
     <CellBorder color={TETROMINOS[type].color}>
-      <StyledCell type={type} color={TETROMINOS[type].color} exploding={exploding}>
+      <StyledCell type={type} color={TETROMINOS[type].color} sparkling={sparkling}>
         {item && itemMapper[item]}
       </StyledCell>
     </CellBorder>
@@ -26,14 +26,13 @@ export const Cell = ({ type, item, exploding }) => {
 
 export default memo(Cell);
 
-const sparkling = keyframes`
- 0.00% { background-color: red;    }
- 16.67% { background-color: orange; }
- 33.33% { background-color: yellow; }
- 50.00% { background-color: green;  }
- 66.67% { background-color: blue;   }
- 83.33% { background-color: indigo; }
-100.00% { background-color: violet; }
+const sparkle = keyframes`
+ 16.67% { background-color: yellow; }
+ 33.33% { background-color: orange; }
+ 50.00% { background-color: salmon; }
+ 66.67% { background-color: green;  }
+ 83.33% { background-color: blue;   }
+100.00% { background-color: indigo; }
 `;
 
 const CellBorder = styled.div`
@@ -43,7 +42,7 @@ const CellBorder = styled.div`
 
 const StyledCell = styled.div`
   height: 100%;
-  background-color: ${({ color, exploding }) => (exploding ? 'red' : color)};
+  background-color: ${({ color }) => color};
   border: ${({ type }) => (type === '0' ? 'none' : '1px solid')};
   border-color: ${({ color }) => lighten(0.3, color)};
 
@@ -51,10 +50,10 @@ const StyledCell = styled.div`
   justify-content: center;
   align-items: center;
 
-  ${({ exploding }) =>
-    exploding &&
+  ${({ sparkling }) =>
+    sparkling &&
     css`
-      animation-name: ${sparkling};
+      animation-name: ${sparkle};
       animation-duration: 0.5s;
       animation-timing-function: ease-in-out;
       animation-iteration-count: infinite;
