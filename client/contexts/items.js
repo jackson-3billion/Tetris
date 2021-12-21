@@ -3,20 +3,20 @@ import React, { createContext, useState } from 'react';
 const ItemsContext = createContext({
   state: {
     items: [],
-    exploding: false,
+    sparkling: false,
   },
   actions: {
     setItems: () => {},
-    setExploding: () => {},
+    setSparkling: () => {},
   },
 });
 
 const ItemsProvider = ({ children }) => {
   const [items, setItems] = useState([]);
-  const [exploding, setExploding] = useState(false);
+  const [sparkling, setSparkling] = useState(false);
   const value = {
-    state: { items, exploding },
-    actions: { setItems, setExploding },
+    state: { items, sparkling },
+    actions: { setItems, setSparkling },
   };
 
   return <ItemsContext.Provider value={value}>{children}</ItemsContext.Provider>;
