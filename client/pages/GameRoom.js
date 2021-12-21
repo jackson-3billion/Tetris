@@ -18,8 +18,8 @@ const GameRoom = () => {
   const [isGameOverModalOpen, openGameOverModal, hideGameOverModal, GameOverModal] = useModal();
   const [isPauseModalOpen, openPauseModal, hidePauseModal, PauseModal] = useModal();
 
-  const [gameState, dispatch] = useReducer(reducer, initialState);
-  const { joined, started, paused, isHost, isReady, isGameOver, opponentNickname } = gameState;
+  const [gameRoomState, dispatch] = useReducer(reducer, initialState);
+  const { joined, started, paused, isHost, isReady, isGameOver, opponentNickname } = gameRoomState;
 
   const handleStateChange = useCallback((k) => (v) => dispatch({ payload: { [k]: v } }), []);
 
