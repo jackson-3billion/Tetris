@@ -71,7 +71,7 @@ export const TETROMINOS = {
 
 const ITEM_CHANCE = 0.5;
 //const ITEMS = ['bomb', 'star', 'faster', 'slower'];
-const ITEMS = ['bomb'];
+const ITEMS = ['star'];
 
 const getRandomItem = () => {
   const hasItem = Math.random() > ITEM_CHANCE;
