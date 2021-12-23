@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useReducer } from 'react';
+import React, { useCallback, useEffect, useReducer, useRef } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import styled from '@emotion/styled';
 
@@ -6,11 +6,13 @@ import useSocket from '@hooks/useSocket';
 import useModal from '@hooks/useModal';
 
 import Tetris from '@components/Tetris';
+import ItemToastPortal from '@components/toast/ItemToastPortal';
 import Opponent from '@components/Opponent';
 import Timer from '@components/Timer';
 import Button from '@components/Button';
 
 const GameRoom = () => {
+  const portalRef = useRef();
   const navigate = useNavigate();
   const { id: gameRoomId } = useParams();
   const { state: nickname } = useLocation();
@@ -62,8 +64,14 @@ const GameRoom = () => {
             isHost={isHost}
             isOpponentReady={isReady}
             socketRef={socketRef}
+            portalRef={portalRef}
           />
-          {!!opponentNickname && <Opponent socketRef={socketRef} opponentNickname={opponentNickname} />}
+          {!!opponentNickname && (
+            <>
+              <ItemToastPortal ref={portalRef} />
+              <Opponent socketRef={socketRef} opponentNickname={opponentNickname} />
+            </>
+          )}
         </Wrapper>
       )}
       {isGameOverModalOpen && <GameOverModal>GAME OVER</GameOverModal>}
@@ -93,4 +101,5 @@ const reducer = (state, action) => ({ ...state, ...action.payload });
 
 const Wrapper = styled.div`
   display: flex;
+  border: 3px solid purple;
 `;
