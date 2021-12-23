@@ -6,27 +6,29 @@ import { v4 as uuid } from 'uuid';
 import ItemToast from '@components/toast/ItemToast';
 
 const ItemToastPortal = forwardRef((_, ref) => {
-  const [toasts, setToasts] = useState([]);
+  const [items, setItems] = useState([]);
 
   useImperativeHandle(ref, () => ({
-    addMessage(toast) {
-      setToasts([...toasts, { ...toast, id: uuid() }]);
+    addItem(item) {
+      const id = uuid();
+      setItems([...items, { ...item, id }]);
+      setTimeout(() => setItems((prevItems) => prevItems.filter((prevItem) => prevItem.id !== id)), 1000);
     },
   }));
 
   return ReactDOM.createPortal(
-    <ToastContainer>
-      {toasts.map((toast) => (
-        <ItemToast key={toast.id} message={toast.message} delay={2000}></ItemToast>
+    <ItemToastContainer>
+      {items.map((item) => (
+        <ItemToast key={item.id} name={item.name} description={item.description} delay={2000} />
       ))}
-    </ToastContainer>,
-    document.getElementById('item-sent'),
+    </ItemToastContainer>,
+    document.getElementById('item-sent-portal'),
   );
 });
 
 export default ItemToastPortal;
 
-const ToastContainer = styled.div`
+const ItemToastContainer = styled.div`
   border: 2px solid green;
   position: absolute;
   top: 300px;
