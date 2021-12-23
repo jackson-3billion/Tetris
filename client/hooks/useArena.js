@@ -34,7 +34,7 @@ const useArena = (player, resetPlayer, setPlaying) => {
         }),
       );
 
-      const items = new Set();
+      const items = [];
       const rowsToSweep = [];
       outer: for (let y = ARENA_HEIGHT - 1; y >= 0; y--) {
         for (let x = 0; x < ARENA_WIDTH; x++) {
@@ -44,11 +44,13 @@ const useArena = (player, resetPlayer, setPlaying) => {
         rowsToSweep.push(y);
       }
       rowsToSweep.forEach((line) => {
-        newArena[line].forEach(([, , item]) => item && items.add(item));
+        newArena[line].forEach(([, , item]) => item && items.push(item));
         newArena.splice(line, 1);
       });
 
-      items.size && setTimeout(() => actions.setItems([...items]), 0);
+      const uniqueItems = items.filter((item, idx) => items.findIndex((el) => el.name === item.name) === idx);
+
+      uniqueItems.length && setTimeout(() => actions.setItems([...uniqueItems]), 0);
       const newEmptyRows = Array.from(Array(rowsToSweep.length), () => new Array(ARENA_WIDTH).fill(['0', 'A']));
 
       if (player.collided) {
