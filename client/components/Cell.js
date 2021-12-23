@@ -4,21 +4,13 @@ import { keyframes, css } from '@emotion/react';
 import { lighten, darken } from 'polished';
 
 import { TETROMINOS } from '@utils/tetrominos';
-
-import { FaForward, FaBackward, FaStar, FaBomb } from 'react-icons/fa';
-
-const itemMapper = {
-  bomb: <FaBomb color="black" size="90%" />,
-  star: <FaStar color="yellow" size="90%" />,
-  faster: <FaForward color="green" size="90%" />,
-  slower: <FaBackward color="crimson" size="90%" />,
-};
+import { itemMapper } from '@utils/items';
 
 export const Cell = ({ type, item, sparkling }) => {
   return (
     <CellBorder color={TETROMINOS[type].color}>
       <StyledCell type={type} color={TETROMINOS[type].color} sparkling={sparkling}>
-        {item && itemMapper[item]}
+        {item && itemMapper[item.name]}
       </StyledCell>
     </CellBorder>
   );
