@@ -1,3 +1,5 @@
+import { getRandomItem } from '@utils/items';
+
 export const TETROMINOS = {
   0: {
     shape: [['0']],
@@ -67,15 +69,6 @@ export const TETROMINOS = {
     color: '#1abc9c', // turquoise
     itemPos: { y: 0, x: 1 },
   },
-};
-
-const ITEM_CHANCE = 0.5;
-//const ITEMS = ['bomb', 'star', 'faster', 'slower'];
-const ITEMS = ['star'];
-
-const getRandomItem = () => {
-  const hasItem = Math.random() > ITEM_CHANCE;
-  return hasItem && ITEMS[Math.floor(Math.random() * ITEMS.length)];
 };
 
 export const randomTetromino = () => {
