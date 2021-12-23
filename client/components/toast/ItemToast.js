@@ -1,10 +1,12 @@
 import React from 'react';
 import styled from '@emotion/styled';
 
-const ItemToast = ({ message }) => {
+const ItemToast = ({ name, description, delay }) => {
   return (
     <ToastBox>
-      <ToastMsg>{message}</ToastMsg>
+      <ToastMsg>
+        {name}:{description}
+      </ToastMsg>
     </ToastBox>
   );
 };
@@ -13,4 +15,4 @@ export default ItemToast;
 
 const ToastBox = styled.div``;
 
-const ToastMsg = styled.msg``;
+const ToastMsg = styled.div``;
