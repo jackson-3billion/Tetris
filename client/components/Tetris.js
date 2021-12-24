@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback, useContext } from 'react';
 import styled from '@emotion/styled';
+//import { MdDoubleArrow } from 'react-icons/md';
 
 import ItemsContext from '@contexts/items';
 
@@ -15,10 +16,11 @@ import colors from '@utils/colors';
 import { createArena, checkCollision, rotateMatrix, rotateItem, removeOneRow } from '@utils/gameHelper';
 import { DROP_FAST, DROP_SLOW, DROP_PAUSED, LEFTWARD, RIGHTWARD, DOWNWARD, KEYHOLD_MAX_CNT } from '@utils/constants';
 
-const Tetris = ({ started, setStarted, paused, isHost, isOpponentReady, socketRef }) => {
+const Tetris = ({ started, setStarted, paused, isHost, isOpponentReady, socketRef, sendPortalRef }) => {
   const [level, setLevel] = useState(1); // level => dropInterval 설정
   const { state, actions } = useContext(ItemsContext);
   const [isReady, setIsReady] = useState(false); // guest 입장에서 필요 <-> isOpponentReady: host가 필요
+  const [pressedSpacebar, setPressedSpacebar] = useState(false);
   const [player, setPlayer, movePlayer, resetPlayer] = usePlayer();
   const [arena, setArena] = useArena(player, resetPlayer, setStarted);
   const keyHoldCounterRef = useRef(0);
@@ -73,30 +75,57 @@ const Tetris = ({ started, setStarted, paused, isHost, isOpponentReady, socketRe
   }, [started, isReady, socketRef]);
 
   useEffect(() => {
-    let time = 0;
+    if (pressedSpacebar) {
+      setPressedSpacebar(false);
+      drop();
+    }
+  }, [pressedSpacebar, drop]);
+
+  useEffect(() => {
+    const socket = socketRef.current;
+    let attackItemCnt = 0;
+
     while (state.items.length) {
-      time += 500;
       const item = state.items.pop();
-      switch (item) {
-        case 'star':
-          // css effect
+      switch (item.name) {
+        case 'star': // 자신에게 적용되는 아이템
           actions.setSparkling(true);
           setTimeout(() => {
             actions.setSparkling(false);
             removeOneRow(setArena, player)();
-          }, time);
+          }, 500);
           break;
-        case 'bomb':
+        case 'slower': // 자신에게 적용되는 아이템
           break;
-        case 'faster':
-          break;
-        case 'slower':
+        case 'bomb': // 상대에게 적용되는 아이템
+        case 'faster': // 상대에게 적용되는 아이템
+          setTimeout(() => {
+            sendPortalRef.current.addItem(item);
+            socket.emit('item', item);
+          }, attackItemCnt * 500);
+          ++attackItemCnt;
           break;
         default:
           return;
       }
     }
-  }, [state.items, setArena, player, actions]);
+  }, [state.items, setArena, player, actions, socketRef, sendPortalRef]);
+
+  const dropToBottom = () => {
+    let cnt = 1;
+    while (!checkCollision(arena, player, { x: 0, y: cnt })) {
+      ++cnt;
+    }
+    setPlayer((prev) => ({
+      ...prev,
+      collided: true,
+      pos: {
+        x: prev.pos.x,
+        y: (prev.pos.y += cnt - 1),
+      },
+    }));
+    setPressedSpacebar(true);
+  };
 
   const handleButtonClick = useCallback(() => {
     if (!started && isHost && isOpponentReady) {
@@ -170,6 +199,10 @@ const Tetris = ({ started, setStarted, paused, isHost, isOpponentReady, socketRe
 
         player.tetromino.shape = rotateMatrix(player.tetromino.shape, 1);
         player.tetromino.itemPos = rotateItem(player.tetromino.itemPos, rotatedTetromino.length, 1);
+        break;
+      case 'Spacebar':
+      case ' ':
+        dropToBottom();
         break;
       default:
     }
