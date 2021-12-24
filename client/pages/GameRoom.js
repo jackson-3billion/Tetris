@@ -6,17 +6,19 @@ import useSocket from '@hooks/useSocket';
 import useModal from '@hooks/useModal';
 
 import Tetris from '@components/Tetris';
-import ItemToastPortal from '@components/toast/ItemToastPortal';
+import ItemSendPortal from '@components/toast/ItemSendPortal';
+import ItemReceivePortal from '@components/toast/ItemReceivePortal';
 import Opponent from '@components/Opponent';
 import Timer from '@components/Timer';
 import Button from '@components/Button';
 
 const GameRoom = () => {
-  const portalRef = useRef();
   const navigate = useNavigate();
   const { id: gameRoomId } = useParams();
   const { state: nickname } = useLocation();
   const socketRef = useSocket(`http://localhost:9000`);
+  const sendPortalRef = useRef();
+  const receivePortalRef = useRef();
   const [isGameOverModalOpen, openGameOverModal, hideGameOverModal, GameOverModal] = useModal();
   const [isPauseModalOpen, openPauseModal, hidePauseModal, PauseModal] = useModal();
 
@@ -38,6 +40,7 @@ const GameRoom = () => {
     socket.on('nickname', (opponentNickname) => dispatch({ payload: { opponentNickname } }));
     socket.on('isReady', (isReady) => dispatch({ payload: { isReady } }));
     socket.on('start', () => dispatch({ payload: { started: true, isGameOver: false, isWinner: false } }));
+    socket.on('item', (item) => receivePortalRef.current.addItem(item));
     socket.on('paused', (paused) => dispatch({ payload: { paused } }));
     socket.on('gameOver', (winner) => dispatch({ payload: { isGameOver: true, isWinner: nickname === winner } }));
     socket.on('opponentLeft', () => dispatch({ payload: { started: false, isHost: true, opponentNickname: '' } }));
@@ -64,11 +67,13 @@ const GameRoom = () => {
             isHost={isHost}
             isOpponentReady={isReady}
             socketRef={socketRef}
-            portalRef={portalRef}
+            sendPortalRef={sendPortalRef}
           />
+
           {!!opponentNickname && (
             <>
-              <ItemToastPortal ref={portalRef} />
+              <ItemSendPortal ref={sendPortalRef} />
+              <ItemReceivePortal ref={receivePortalRef} />
               <Opponent socketRef={socketRef} opponentNickname={opponentNickname} />
             </>
           )}
@@ -101,5 +106,5 @@ const reducer = (state, action) => ({ ...state, ...action.payload });
 
 const Wrapper = styled.div`
   display: flex;
-  border: 3px solid purple;
+  //border: 3px solid purple;
 `;
