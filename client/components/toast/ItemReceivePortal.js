@@ -5,7 +5,7 @@ import { v4 as uuid } from 'uuid';
 
 import ItemToast from '@components/toast/ItemToast';
 
-const ItemToastPortal = forwardRef((_, ref) => {
+const ItemReceivePortal = forwardRef((_, ref) => {
   const [items, setItems] = useState([]);
 
   useImperativeHandle(ref, () => ({
@@ -19,23 +19,19 @@ const ItemToastPortal = forwardRef((_, ref) => {
   return ReactDOM.createPortal(
     <ItemToastContainer>
       {items.map((item) => (
-        <ItemToast key={item.id} name={item.name} description={item.description} delay={2000} />
+        <ItemToast key={item.id} name={item.name} description={item.description} isSending={false} />
       ))}
     </ItemToastContainer>,
-    document.getElementById('item-sent-portal'),
+    document.getElementById('item-receive-portal'),
   );
 });
 
-export default ItemToastPortal;
+export default ItemReceivePortal;
 
 const ItemToastContainer = styled.div`
-  border: 2px solid green;
   position: absolute;
-  top: 300px;
-  left: calc(30%);
+  top: 400px;
+  left: calc(40%);
   width: 20%;
   height: 80px;
-  //left: 50%;
-  //transform: translate(-50%, -50%);
-  //width: 15%;
 `;
