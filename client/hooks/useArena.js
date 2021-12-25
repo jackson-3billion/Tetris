@@ -1,13 +1,13 @@
 import { useState, useEffect, useContext } from 'react';
 
-import ItemsContext from '@contexts/items';
+import StatusContext from '@contexts/status';
 
 import { createArena, checkCollision } from '@utils/gameHelper';
 import { ARENA_HEIGHT, ARENA_WIDTH } from '@utils/constants';
 
 const useArena = (player, resetPlayer, setPlaying) => {
   const [arena, setArena] = useState(createArena());
-  const { actions } = useContext(ItemsContext);
+  const { actions } = useContext(StatusContext);
 
   useEffect(() => {
     setArena((prevArena) => {
