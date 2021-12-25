@@ -38,7 +38,7 @@ export const rotateItem = ({ y, x }, size, dir) => {
   return dir === -1 ? { y: size - 1 - x, x: y } : { y: x, x: size - 1 - y };
 };
 
-export const removeOneRow = (setArena, player) => () => {
+export const removeOneRow = (setArena, player) => {
   setArena((prevArena) => {
     const filterPlayer = (cell) => (cell[1] === 'A' ? cell : ['0', 'A']);
     const newArena = prevArena.map((row) => row.map(filterPlayer));
