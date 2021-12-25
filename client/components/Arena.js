@@ -1,12 +1,12 @@
 import React, { useContext } from 'react';
 import styled from '@emotion/styled';
 
-import ItemsContext from '@contexts/items';
+import StatusContext from '@contexts/status';
 
 import Cell from './Cell';
 
 const Arena = ({ arena }) => {
-  const { state } = useContext(ItemsContext);
+  const { state } = useContext(StatusContext);
   const checkSparkling = (type, y) => state.sparkling && type !== '0' && y === arena.length - 1;
 
   return (

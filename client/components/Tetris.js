@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect, useCallback, useContext } from 'rea
 import styled from '@emotion/styled';
 //import { MdDoubleArrow } from 'react-icons/md';
 
-import ItemsContext from '@contexts/items';
+import StatusContext from '@contexts/status';
 
 import useArena from '@hooks/useArena';
 import usePlayer from '@hooks/usePlayer';
@@ -17,12 +17,14 @@ import { createArena, checkCollision, rotateMatrix, rotateItem, removeOneRow } f
 import { DROP_FAST, DROP_SLOW, DROP_PAUSED, LEFTWARD, RIGHTWARD, DOWNWARD, KEYHOLD_MAX_CNT } from '@utils/constants';
 
 const Tetris = ({ started, setStarted, paused, isHost, isOpponentReady, socketRef, sendPortalRef }) => {
-  const [level, setLevel] = useState(1); // level => dropInterval 설정
-  const { state, actions } = useContext(ItemsContext);
+  const { state, actions } = useContext(StatusContext);
+  const { level, speed, items } = state;
+  const { setSpeed } = actions;
   const [isReady, setIsReady] = useState(false); // guest 입장에서 필요 <-> isOpponentReady: host가 필요
   const [pressedSpacebar, setPressedSpacebar] = useState(false);
   const [player, setPlayer, movePlayer, resetPlayer] = usePlayer();
   const [arena, setArena] = useArena(player, resetPlayer, setStarted);
+  const focusRef = useRef();
   const keyHoldCounterRef = useRef(0);
 
   const drop = () => {
@@ -36,6 +38,12 @@ const Tetris = ({ started, setStarted, paused, isHost, isOpponentReady, socketRe
   };
 
   const [dropInterval, setDropInterval, cancelAnimation] = useAnimationFrame(drop, DROP_SLOW, started);
+
+  useEffect(() => focusRef.current.focus());
+
+  useEffect(() => {
+    setSpeed(1000 - (level - 1) * 50);
+  }, [level, setSpeed]);
 
   // 게임 시작 및 재시작
   useEffect(() => {
@@ -85,14 +93,14 @@ const Tetris = ({ started, setStarted, paused, isHost, isOpponentReady, socketRe
     const socket = socketRef.current;
     let attackItemCnt = 0;
 
-    while (state.items.length) {
-      const item = state.items.pop();
+    while (items.length) {
+      const item = items.pop();
       switch (item.name) {
         case 'star': // 자신에게 적용되는 아이템
           actions.setSparkling(true);
           setTimeout(() => {
             actions.setSparkling(false);
-            removeOneRow(setArena, player)();
+            removeOneRow(setArena, player);
           }, 500);
           break;
         case 'slower': // 자신에게 적용되는 아이템
@@ -109,7 +117,7 @@ const Tetris = ({ started, setStarted, paused, isHost, isOpponentReady, socketRe
           return;
       }
     }
-  }, [state.items, setArena, player, actions, socketRef, sendPortalRef]);
+  }, [items, setArena, player, actions, socketRef, sendPortalRef]);
 
   const dropToBottom = () => {
     let cnt = 1;
@@ -227,10 +235,12 @@ const Tetris = ({ started, setStarted, paused, isHost, isOpponentReady, socketRe
   };
 
   return (
-    <TetrisWrapper role="button" tabIndex="0" onKeyDown={handleKeyDown} onKeyUp={handleKeyUp}>
+    <TetrisWrapper ref={focusRef} role="button" tabIndex="0" onKeyDown={handleKeyDown} onKeyUp={handleKeyUp}>
       <TetrisGame>
         <Arena arena={arena} />
         <aside>
+          <Display text={level} />
+          <Display text={speed} />
           <Display text={started ? 'playing' : 'game over'} />
           <Button callback={handleButtonClick} text={getButtonText()} color={getButtonColor()} />
           {started && (
