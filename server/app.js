@@ -27,7 +27,6 @@ io.on('connection', socket => {
 
     socket.join(gameRoomId);
     socket.emit('joined', playerNum);
-    //console.log(io.sockets.adapter.rooms.get(gameRoomId));
 
     if (playerNum === 0) {
       socket.emit('waiting', 'waiting for another player to join');
@@ -58,7 +57,7 @@ io.on('connection', socket => {
     socket.on('resume', () => io.to(gameRoomId).emit('paused', false));
 
     socket.on('disconnect', () => {
-      //console.log(getPlayerNum(io, gameRoomId));
+      socket.leave(gameRoomId);
       socket.broadcast.to(gameRoomId).emit('opponentLeft', 'opponent left the room');
     });
   });
