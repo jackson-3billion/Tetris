@@ -1,7 +1,11 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useContext } from 'react';
 import styled from '@emotion/styled';
 
+import StatusContext from '@contexts/status';
+
 const Timer = ({ started, paused }) => {
+  const { actions } = useContext(StatusContext);
+  const { setLevel } = actions;
   const [time, setTime] = useState({ min: 0, sec: 0 });
   const timerIdRef = useRef();
 
@@ -22,6 +26,12 @@ const Timer = ({ started, paused }) => {
 
     return () => clearTimeout(timerIdRef.current);
   }, [started, paused]);
+
+  useEffect(() => {
+    if (time.sec === 29 || time.sec === 59) {
+      setLevel((prevLevel) => prevLevel + 1);
+    }
+  }, [time, setLevel]);
 
   return (
     <TimerBox>

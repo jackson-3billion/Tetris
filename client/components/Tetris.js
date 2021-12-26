@@ -1,5 +1,8 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useContext } from 'react';
 import styled from '@emotion/styled';
+//import { MdDoubleArrow } from 'react-icons/md';
+
+import StatusContext from '@contexts/status';
 
 import useArena from '@hooks/useArena';
 import usePlayer from '@hooks/usePlayer';
@@ -10,13 +13,18 @@ import Display from '@components/Display';
 import Button from '@components/Button';
 
 import colors from '@utils/colors';
-import { createArena, checkCollision, rotateMatrix } from '@utils/gameHelper';
+import { createArena, checkCollision, rotateMatrix, rotateItem, removeOneRow } from '@utils/gameHelper';
 import { DROP_FAST, DROP_SLOW, DROP_PAUSED, LEFTWARD, RIGHTWARD, DOWNWARD, KEYHOLD_MAX_CNT } from '@utils/constants';
 
-const Tetris = ({ started, setStarted, paused, isHost, isOpponentReady, socketRef }) => {
+const Tetris = ({ started, setStarted, paused, isHost, isOpponentReady, socketRef, sendPortalRef }) => {
+  const { state, actions } = useContext(StatusContext);
+  const { level, speed, items } = state;
+  const { setSpeed } = actions;
   const [isReady, setIsReady] = useState(false); // guest 입장에서 필요 <-> isOpponentReady: host가 필요
+  const [pressedSpacebar, setPressedSpacebar] = useState(false);
   const [player, setPlayer, movePlayer, resetPlayer] = usePlayer();
   const [arena, setArena] = useArena(player, resetPlayer, setStarted);
+  const focusRef = useRef();
   const keyHoldCounterRef = useRef(0);
 
   const drop = () => {
@@ -29,12 +37,19 @@ const Tetris = ({ started, setStarted, paused, isHost, isOpponentReady, socketRe
     movePlayer(DOWNWARD);
   };
 
-  const [dropDelay, setDropDelay, cancelAnimation] = useAnimationFrame(drop, DROP_SLOW, started);
+  const [dropInterval, setDropInterval, cancelAnimation] = useAnimationFrame(drop, DROP_SLOW, started);
+
+  useEffect(() => focusRef.current.focus());
+
+  useEffect(() => {
+    setSpeed(1000 - (level - 1) * 50);
+  }, [level, setSpeed]);
 
   // 게임 시작 및 재시작
   useEffect(() => {
     if (started) {
       setArena(createArena());
+      // resetDropInterval
       resetPlayer();
     }
   }, [started, setArena, resetPlayer]);
@@ -42,16 +57,14 @@ const Tetris = ({ started, setStarted, paused, isHost, isOpponentReady, socketRe
   useEffect(() => {
     if (!started) return;
     if (paused) {
-      // TODO: save current drop-delay in dropDelayRef
-      cancelAnimation();
-      setDropDelay(DROP_PAUSED);
+      // TODO: save current drop-delay in dropIntervalRef
+      setDropInterval(DROP_PAUSED);
     }
     if (!paused) {
-      // TODO: restore drop-delay saved in dropDelayRef
-      //cancelAnimation();
-      setDropDelay(DROP_SLOW);
+      // TODO: restore drop-delay saved in dropIntervalRef
+      setDropInterval(DROP_SLOW);
     }
-  }, [paused, started, setDropDelay, cancelAnimation]);
+  }, [paused, started, setDropInterval]);
 
   // 사용자의 화면 변경사항을 상대에게 전송
   useEffect(() => {
@@ -69,6 +82,59 @@ const Tetris = ({ started, setStarted, paused, isHost, isOpponentReady, socketRe
     }
   }, [started, isReady, socketRef]);
 
+  useEffect(() => {
+    if (pressedSpacebar) {
+      setPressedSpacebar(false);
+      drop();
+    }
+  }, [pressedSpacebar, drop]);
+
+  useEffect(() => {
+    const socket = socketRef.current;
+    let attackItemCnt = 0;
+
+    while (items.length) {
+      const item = items.pop();
+      switch (item.name) {
+        case 'star': // 자신에게 적용되는 아이템
+          actions.setSparkling(true);
+          setTimeout(() => {
+            actions.setSparkling(false);
+            removeOneRow(setArena, player);
+          }, 500);
+          break;
+        case 'slower': // 자신에게 적용되는 아이템
+          break;
+        case 'bomb': // 상대에게 적용되는 아이템
+        case 'faster': // 상대에게 적용되는 아이템
+          setTimeout(() => {
+            sendPortalRef.current.addItem(item);
+            socket.emit('item', item);
+          }, attackItemCnt * 500);
+          ++attackItemCnt;
+          break;
+        default:
+          return;
+      }
+    }
+  }, [items, setArena, player, actions, socketRef, sendPortalRef]);
+
+  const dropToBottom = () => {
+    let cnt = 1;
+    while (!checkCollision(arena, player, { x: 0, y: cnt })) {
+      ++cnt;
+    }
+    setPlayer((prev) => ({
+      ...prev,
+      collided: true,
+      pos: {
+        x: prev.pos.x,
+        y: (prev.pos.y += cnt - 1),
+      },
+    }));
+    setPressedSpacebar(true);
+  };
+
   const handleButtonClick = useCallback(() => {
     if (!started && isHost && isOpponentReady) {
       const socket = socketRef.current;
@@ -85,11 +151,10 @@ const Tetris = ({ started, setStarted, paused, isHost, isOpponentReady, socketRe
   }, [paused, socketRef]);
 
   const handleKeyUp = ({ key }) => {
-    if (!started || paused) return;
     if (key !== 'ArrowDown') return;
-    //cancelAnimationFrame(requestIdRef.current);
+    if (!started || paused) return;
     cancelAnimation();
-    setDropDelay(DROP_SLOW);
+    setDropInterval(DROP_SLOW);
   };
 
   const handleKeyHold = (callback, args) => {
@@ -119,25 +184,33 @@ const Tetris = ({ started, setStarted, paused, isHost, isOpponentReady, socketRe
         }
         break;
       case 'ArrowDown':
-        if (dropDelay === DROP_SLOW) {
-          //cancelAnimationFrame(requestIdRef.current);
-          cancelAnimation();
-          setDropDelay(DROP_FAST);
+        if (dropInterval === DROP_SLOW) {
+          setDropInterval(DROP_FAST);
         }
         break;
       case 'ArrowUp':
-        const rotatedTetromino = rotateMatrix(player.tetromino, -1);
-        player.tetromino = rotatedTetromino;
+        const rotatedTetromino = rotateMatrix(player.tetromino.shape, -1);
+        player.tetromino.shape = rotatedTetromino;
+        player.tetromino.itemPos = rotateItem(player.tetromino.itemPos, rotatedTetromino.length, -1);
         if (!checkCollision(arena, player, { x: 0, y: 0 })) {
           return setPlayer({ ...player });
         }
-        if (!checkCollision(arena, player, { x: -1, y: 0 })) {
-          return movePlayer(LEFTWARD);
+        for (let i = 1; i <= 2; i++) {
+          if (!checkCollision(arena, player, { x: -1 * i, y: 0 })) {
+            return movePlayer({ x: -1 * i, y: 0 });
+          }
+
+          if (!checkCollision(arena, player, { x: 1 * i, y: 0 })) {
+            return movePlayer({ x: 1 * i, y: 0 });
+          }
         }
-        if (!checkCollision(arena, player, { x: 1, y: 0 })) {
-          return movePlayer(RIGHTWARD);
-        }
-        player.tetromino = rotateMatrix(player.tetromino, 1);
+
+        player.tetromino.shape = rotateMatrix(player.tetromino.shape, 1);
+        player.tetromino.itemPos = rotateItem(player.tetromino.itemPos, rotatedTetromino.length, 1);
+        break;
+      case 'Spacebar':
+      case ' ':
+        dropToBottom();
         break;
       default:
     }
@@ -162,10 +235,12 @@ const Tetris = ({ started, setStarted, paused, isHost, isOpponentReady, socketRe
   };
 
   return (
-    <TetrisWrapper role="button" tabIndex="0" onKeyDown={handleKeyDown} onKeyUp={handleKeyUp}>
+    <TetrisWrapper ref={focusRef} role="button" tabIndex="0" onKeyDown={handleKeyDown} onKeyUp={handleKeyUp}>
       <TetrisGame>
         <Arena arena={arena} />
         <aside>
+          <Display text={level} />
+          <Display text={speed} />
           <Display text={started ? 'playing' : 'game over'} />
           <Button callback={handleButtonClick} text={getButtonText()} color={getButtonColor()} />
           {started && (

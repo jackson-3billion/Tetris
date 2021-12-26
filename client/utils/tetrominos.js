@@ -1,7 +1,10 @@
+import { getRandomItem } from '@utils/items';
+
 export const TETROMINOS = {
   0: {
     shape: [['0']],
     color: '#000000',
+    itemPos: { y: -1, x: -1 },
   },
   I: {
     shape: [
@@ -11,6 +14,7 @@ export const TETROMINOS = {
       ['0', 'I', '0', '0'],
     ],
     color: '#3498db', // blue
+    itemPos: { y: 1, x: 1 },
   },
   J: {
     shape: [
@@ -19,6 +23,7 @@ export const TETROMINOS = {
       ['J', 'J', '0'],
     ],
     color: '#f1c40f', //yellow
+    itemPos: { y: 1, x: 1 },
   },
   L: {
     shape: [
@@ -27,6 +32,7 @@ export const TETROMINOS = {
       ['0', 'L', 'L'],
     ],
     color: '#2ecc71', //green
+    itemPos: { y: 0, x: 1 },
   },
   O: {
     shape: [
@@ -34,6 +40,7 @@ export const TETROMINOS = {
       ['O', 'O'],
     ],
     color: '#e74c3c', // red
+    itemPos: { y: 1, x: 0 },
   },
   S: {
     shape: [
@@ -42,6 +49,7 @@ export const TETROMINOS = {
       ['0', '0', '0'],
     ],
     color: '#9b59b6', // purple
+    itemPos: { y: 0, x: 2 },
   },
   Z: {
     shape: [
@@ -50,6 +58,7 @@ export const TETROMINOS = {
       ['0', '0', '0'],
     ],
     color: '#e67e22', // orange
+    itemPos: { y: 0, x: 0 },
   },
   T: {
     shape: [
@@ -58,11 +67,14 @@ export const TETROMINOS = {
       ['0', '0', '0'],
     ],
     color: '#1abc9c', // turquoise
+    itemPos: { y: 0, x: 1 },
   },
 };
 
 export const randomTetromino = () => {
   const tetromino_types = 'LJSZOTI';
   const randomType = tetromino_types[Math.floor(Math.random() * tetromino_types.length)];
-  return TETROMINOS[randomType];
+  const tetromino = { ...TETROMINOS[randomType], item: getRandomItem() };
+
+  return tetromino;
 };

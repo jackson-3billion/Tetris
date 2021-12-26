@@ -1,12 +1,11 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 
-const useAnimationFrame = (callback, _delay, started) => {
-  const [delay, setDelay] = useState(_delay);
+const useAnimationFrame = (callback, delay, started) => {
+  const [interval, setInterval] = useState(delay);
   const timeRef = useRef(0);
   const counterRef = useRef(0);
   const savedCallbackRef = useRef();
   const requestIdRef = useRef();
-
   const cancelAnimation = useCallback(() => cancelAnimationFrame(requestIdRef.current), []);
 
   useEffect(() => {
@@ -14,6 +13,8 @@ const useAnimationFrame = (callback, _delay, started) => {
   }, [callback]);
 
   useEffect(() => {
+    // 가끔씩 clean-up 함수가 정상적으로 cancelAnimationFrame을 못하는 버그가 있음.
+    cancelAnimationFrame(requestIdRef.current);
     if (!started) return;
 
     const update = (time = 0) => {
@@ -21,7 +22,7 @@ const useAnimationFrame = (callback, _delay, started) => {
       counterRef.current += timeDiff;
       timeRef.current = time;
 
-      if (counterRef.current > delay) {
+      if (counterRef.current > interval) {
         savedCallbackRef.current();
         counterRef.current = 0;
       }
@@ -31,9 +32,9 @@ const useAnimationFrame = (callback, _delay, started) => {
     update();
 
     return () => cancelAnimationFrame(requestIdRef.current);
-  }, [delay, started]);
+  }, [interval, started]);
 
-  return [delay, setDelay, cancelAnimation];
+  return [interval, setInterval, cancelAnimation];
 };
 
 export default useAnimationFrame;

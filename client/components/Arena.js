@@ -1,12 +1,21 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import styled from '@emotion/styled';
+
+import StatusContext from '@contexts/status';
 
 import Cell from './Cell';
 
 const Arena = ({ arena }) => {
+  const { state } = useContext(StatusContext);
+  const checkSparkling = (type, y) => state.sparkling && type !== '0' && y === arena.length - 1;
+
   return (
     <StyledArena width={arena[0].length} height={arena.length}>
-      {arena.map((row) => row.map(([type], idx) => <Cell key={idx} type={type} />))}
+      {arena.map((row, y) =>
+        row.map(([type, , item], idx) => (
+          <Cell key={idx} type={type} item={item} sparkling={checkSparkling(type, y)} />
+        )),
+      )}
     </StyledArena>
   );
 };

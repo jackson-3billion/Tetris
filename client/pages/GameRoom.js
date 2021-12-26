@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useReducer } from 'react';
+import React, { useCallback, useEffect, useReducer, useRef } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import styled from '@emotion/styled';
 
@@ -6,6 +6,8 @@ import useSocket from '@hooks/useSocket';
 import useModal from '@hooks/useModal';
 
 import Tetris from '@components/Tetris';
+import ItemSendPortal from '@components/toast/ItemSendPortal';
+import ItemReceivePortal from '@components/toast/ItemReceivePortal';
 import Opponent from '@components/Opponent';
 import Timer from '@components/Timer';
 import Button from '@components/Button';
@@ -15,18 +17,17 @@ const GameRoom = () => {
   const { id: gameRoomId } = useParams();
   const { state: nickname } = useLocation();
   const socketRef = useSocket(`http://localhost:9000`);
+  const sendPortalRef = useRef();
+  const receivePortalRef = useRef();
   const [isGameOverModalOpen, openGameOverModal, hideGameOverModal, GameOverModal] = useModal();
   const [isPauseModalOpen, openPauseModal, hidePauseModal, PauseModal] = useModal();
 
-  const [state, dispatch] = useReducer(reducer, initialState);
-  const { joined, started, paused, isHost, isReady, isGameOver, opponentNickname } = state;
+  const [gameRoomState, dispatch] = useReducer(reducer, initialState);
+  const { joined, started, paused, isHost, isReady, isGameOver, opponentNickname } = gameRoomState;
 
   const handleStateChange = useCallback((k) => (v) => dispatch({ payload: { [k]: v } }), []);
 
-  const handleResume = () => {
-    const socket = socketRef?.current;
-    socket.emit('resume');
-  };
+  const handleResume = () => socketRef?.current?.emit('resume');
 
   useEffect(() => {
     if (!socketRef?.current) return;
@@ -39,6 +40,7 @@ const GameRoom = () => {
     socket.on('nickname', (opponentNickname) => dispatch({ payload: { opponentNickname } }));
     socket.on('isReady', (isReady) => dispatch({ payload: { isReady } }));
     socket.on('start', () => dispatch({ payload: { started: true, isGameOver: false, isWinner: false } }));
+    socket.on('item', (item) => receivePortalRef.current.addItem(item));
     socket.on('paused', (paused) => dispatch({ payload: { paused } }));
     socket.on('gameOver', (winner) => dispatch({ payload: { isGameOver: true, isWinner: nickname === winner } }));
     socket.on('opponentLeft', () => dispatch({ payload: { started: false, isHost: true, opponentNickname: '' } }));
@@ -65,8 +67,16 @@ const GameRoom = () => {
             isHost={isHost}
             isOpponentReady={isReady}
             socketRef={socketRef}
+            sendPortalRef={sendPortalRef}
           />
-          {!!opponentNickname && <Opponent socketRef={socketRef} opponentNickname={opponentNickname} />}
+
+          {!!opponentNickname && (
+            <>
+              <ItemSendPortal ref={sendPortalRef} />
+              <ItemReceivePortal ref={receivePortalRef} />
+              <Opponent socketRef={socketRef} opponentNickname={opponentNickname} />
+            </>
+          )}
         </Wrapper>
       )}
       {isGameOverModalOpen && <GameOverModal>GAME OVER</GameOverModal>}
@@ -96,4 +106,5 @@ const reducer = (state, action) => ({ ...state, ...action.payload });
 
 const Wrapper = styled.div`
   display: flex;
+  //border: 3px solid purple;
 `;
