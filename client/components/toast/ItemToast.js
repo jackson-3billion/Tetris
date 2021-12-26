@@ -4,12 +4,11 @@ import styled from '@emotion/styled';
 
 import { itemMapper } from '@utils/items';
 
-const ItemToast = ({ name, description, isSending }) => {
+const ItemToast = ({ name, isSending }) => {
   return (
     <Wrapper isSending={isSending}>
       <ToastBox isSending={isSending}>
         <ToastIcon>{itemMapper[name]}</ToastIcon>
-        {/* <ToastMsg>{description}</ToastMsg> */}
       </ToastBox>
     </Wrapper>
   );
@@ -36,21 +35,15 @@ const moveDownAndUp = keyframes`
 `;
 
 const Wrapper = styled.div`
-  position: relative;
+  position: absolute;
   animation: ${({ isSending }) => (isSending ? moveUpAndDown : moveDownAndUp)} 1s forwards ease-in-out;
 `;
 
 const ToastBox = styled.div`
-  position: relative;
   animation: ${({ isSending }) => (isSending ? moveRight : moveLeft)} 1s forwards ease-in-out;
   display: flex;
 `;
 
 const ToastIcon = styled.div`
   width: 20%;
-`;
-
-const ToastMsg = styled.div`
-  color: white;
-  font-weight: bold;
 `;

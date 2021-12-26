@@ -2,7 +2,7 @@ import { useState, useEffect, useContext } from 'react';
 
 import StatusContext from '@contexts/status';
 
-import { createArena, checkCollision } from '@utils/gameHelper';
+import { createArena } from '@utils/gameHelper';
 import { ARENA_HEIGHT, ARENA_WIDTH } from '@utils/constants';
 
 const useArena = (player, resetPlayer, setPlaying) => {
@@ -11,14 +11,6 @@ const useArena = (player, resetPlayer, setPlaying) => {
 
   useEffect(() => {
     setArena((prevArena) => {
-      // if (checkCollision(prevArena, player, { x: 0, y: 0 })) {
-      //   console.log('useArena - useEffect - checkCollision');
-      //   setTimeout(() => {
-      //     setPlaying(false); // game over
-      //     resetPlayer();
-      //   }, 0);
-      //   return prevArena;
-      // }
       const filterPlayer = (cell) => (cell[1] === 'A' ? cell : ['0', 'A']);
       const newArena = prevArena.map((row) => row.map(filterPlayer));
       const { y: pY, x: pX } = player.pos;

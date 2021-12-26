@@ -3,14 +3,14 @@ import styled from '@emotion/styled';
 
 import StatusContext from '@contexts/status';
 
-const Timer = ({ started, paused }) => {
+const Timer = ({ playing, paused }) => {
   const { actions } = useContext(StatusContext);
   const { setLevel } = actions;
   const [time, setTime] = useState({ min: 0, sec: 0 });
   const timerIdRef = useRef();
 
   useEffect(() => {
-    if (started && !paused) {
+    if (playing && !paused) {
       timerIdRef.current = setInterval(() => {
         setTime(({ min, sec }) => {
           if (++sec === 60) {
@@ -25,7 +25,7 @@ const Timer = ({ started, paused }) => {
     clearTimeout(timerIdRef.current);
 
     return () => clearTimeout(timerIdRef.current);
-  }, [started, paused]);
+  }, [playing, paused]);
 
   useEffect(() => {
     if (time.sec === 29 || time.sec === 59) {
