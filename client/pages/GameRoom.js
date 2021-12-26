@@ -1,6 +1,8 @@
-import React, { useCallback, useEffect, useReducer, useRef } from 'react';
+import React, { useCallback, useEffect, useReducer, useRef, useContext } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import styled from '@emotion/styled';
+
+import StatusContext from '@contexts/status';
 
 import useSocket from '@hooks/useSocket';
 import useModal from '@hooks/useModal';
@@ -13,6 +15,10 @@ import Timer from '@components/Timer';
 import Button from '@components/Button';
 
 const GameRoom = () => {
+  const {
+    actions: { setAccel },
+  } = useContext(StatusContext);
+
   const navigate = useNavigate();
   const { id: gameRoomId } = useParams();
   const { state: nickname } = useLocation();
@@ -41,11 +47,22 @@ const GameRoom = () => {
     socket.on('nickname', (opponentNickname) => dispatch({ payload: { opponentNickname } }));
     socket.on('isReady', (isReady) => dispatch({ payload: { isReady } }));
     socket.on('start', () => dispatch({ payload: { playing: true, isGameOver: false, isWinner: false } }));
-    socket.on('item', (item) => receivePortalRef.current.addItem(item));
     socket.on('paused', (paused) => dispatch({ payload: { paused } }));
     socket.on('gameOver', (winner) => dispatch({ payload: { isGameOver: true, isWinner: nickname === winner } }));
     socket.on('opponentLeft', () => dispatch({ payload: { playing: false, isHost: true, opponentNickname: '' } }));
-  }, [socketRef, gameRoomId, nickname, navigate]);
+
+    socket.on('item', (item) => {
+      receivePortalRef.current.addItem(item);
+      switch (item.name) {
+        case 'faster':
+          setAccel((prevAccel) => prevAccel + 1);
+          break;
+        case 'bomb':
+          break;
+        default:
+      }
+    });
+  }, [socketRef, gameRoomId, nickname, navigate, setAccel]);
 
   useEffect(() => {
     paused ? openPauseModal() : hidePauseModal();
