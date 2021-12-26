@@ -18,9 +18,11 @@ const ItemReceivePortal = forwardRef((_, ref) => {
 
   return ReactDOM.createPortal(
     <ItemToastContainer>
-      {items.map((item) => (
-        <ItemToast key={item.id} name={item.name} description={item.description} isSending={false} />
-      ))}
+      <InnerContainer>
+        {items.map((item) => (
+          <ItemToast key={item.id} name={item.name} description={item.description} isSending={false} />
+        ))}
+      </InnerContainer>
     </ItemToastContainer>,
     document.getElementById('item-receive-portal'),
   );
@@ -34,4 +36,10 @@ const ItemToastContainer = styled.div`
   left: calc(40%);
   width: 20%;
   height: 80px;
+`;
+
+const InnerContainer = styled.div`
+  position: relative;
+  height: 100%;
+  border: 2px solid salmon;
 `;
