@@ -13,15 +13,23 @@ import Button from '@components/Button';
 
 import colors from '@utils/colors';
 import { createArena, checkCollision, removeOneRow } from '@utils/gameHelper';
-import { DROP_FAST, DROP_SLOW, DROP_PAUSED, LEFTWARD, RIGHTWARD, DOWNWARD, KEYHOLD_MAX_CNT } from '@utils/constants';
+import {
+  DROP_FAST,
+  DROP_SLOW,
+  DROP_PAUSED,
+  MIN_INTERVAL,
+  LEFTWARD,
+  RIGHTWARD,
+  DOWNWARD,
+  KEYHOLD_MAX_CNT,
+} from '@utils/constants';
 
 const Tetris = ({ gameRoomState, setPlaying, socketRef, sendPortalRef }) => {
   const { playing, paused, isHost, isReady: isOpponentReady } = gameRoomState;
 
   // context
   const { state, actions } = useContext(StatusContext);
-  const { level, speed, items } = state;
-  const { setSpeed } = actions;
+  const { level, items, accel } = state;
 
   // local-state
   const [isReady, setIsReady] = useState(false); // guest 입장에서 필요 <-> isOpponentReady: host가 필요
@@ -34,6 +42,7 @@ const Tetris = ({ gameRoomState, setPlaying, socketRef, sendPortalRef }) => {
 
   // ref
   const focusRef = useRef();
+  const newIntervalRef = useRef(DROP_SLOW);
   const keyHoldCounterRef = useRef(0);
 
   const drop = useCallback(() => {
@@ -49,8 +58,19 @@ const Tetris = ({ gameRoomState, setPlaying, socketRef, sendPortalRef }) => {
   useEffect(() => focusRef.current.focus());
 
   useEffect(() => {
-    setSpeed(1000 - (level - 1) * 50);
-  }, [level, setSpeed]);
+    if (level === 1) return;
+    const newInterval = DROP_SLOW - (level - 1) * 50;
+    if (newInterval >= MIN_INTERVAL) {
+      setDropInterval((prevInterval) => {
+        if (prevInterval === 51) {
+          // 아래방향키 누르고 있는 중일때는 dropInterval 바꾸지 않는다.
+          newIntervalRef.current = newInterval;
+          return prevInterval;
+        }
+        return newInterval;
+      });
+    }
+  }, [level, setDropInterval]);
 
   // 게임 시작 및 재시작
   useEffect(() => {
@@ -64,12 +84,13 @@ const Tetris = ({ gameRoomState, setPlaying, socketRef, sendPortalRef }) => {
   useEffect(() => {
     if (!playing) return;
     if (paused) {
-      // TODO: save current drop-delay in dropIntervalRef
-      setDropInterval(DROP_PAUSED);
+      setDropInterval((prevInterval) => {
+        newIntervalRef.current = prevInterval;
+        return DROP_PAUSED;
+      });
     }
     if (!paused) {
-      // TODO: restore drop-delay saved in dropIntervalRef
-      setDropInterval(DROP_SLOW);
+      setDropInterval(newIntervalRef.current);
     }
   }, [paused, playing, setDropInterval]);
 
@@ -111,6 +132,7 @@ const Tetris = ({ gameRoomState, setPlaying, socketRef, sendPortalRef }) => {
           }, 500);
           break;
         case 'slower': // 자신에게 적용되는 아이템
+          actions.setAccel((accel) => accel - 1);
           break;
         case 'bomb': // 상대에게 적용되는 아이템
         case 'faster': // 상대에게 적용되는 아이템
@@ -162,7 +184,7 @@ const Tetris = ({ gameRoomState, setPlaying, socketRef, sendPortalRef }) => {
       if (key !== 'ArrowDown') return;
       if (!playing || paused) return;
       cancelAnimation();
-      setDropInterval(DROP_SLOW);
+      setDropInterval(newIntervalRef.current);
     },
     [playing, paused, cancelAnimation, setDropInterval],
   );
@@ -184,7 +206,13 @@ const Tetris = ({ gameRoomState, setPlaying, socketRef, sendPortalRef }) => {
         if (checkCollision(arena, player, RIGHTWARD) || player.collided) return;
         return repeat ? handleKeyHold(movePlayer, RIGHTWARD) : movePlayer(RIGHTWARD);
       case 'ArrowDown':
-        return dropInterval === DROP_SLOW && setDropInterval(DROP_FAST);
+        if (dropInterval !== DROP_FAST) {
+          setDropInterval((prevInterval) => {
+            newIntervalRef.current = prevInterval;
+            return DROP_FAST;
+          });
+        }
+        break;
       case 'ArrowUp':
         return rotatePlayer(arena);
       case 'Spacebar':
@@ -218,7 +246,8 @@ const Tetris = ({ gameRoomState, setPlaying, socketRef, sendPortalRef }) => {
         <Arena arena={arena} />
         <aside>
           <Display text={level} />
-          <Display text={speed} />
+          <Display text={dropInterval} />
+          <Display text={accel} />
           <Display text={playing ? 'playing' : 'game over'} />
           <Button callback={handleButtonClick} text={getButtonText()} color={getButtonColor()} />
           {playing && (
