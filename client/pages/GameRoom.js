@@ -16,17 +16,18 @@ const GameRoom = () => {
   const navigate = useNavigate();
   const { id: gameRoomId } = useParams();
   const { state: nickname } = useLocation();
+
   const socketRef = useSocket(`http://localhost:9000`);
   const sendPortalRef = useRef();
   const receivePortalRef = useRef();
+
   const [isGameOverModalOpen, openGameOverModal, hideGameOverModal, GameOverModal] = useModal();
   const [isPauseModalOpen, openPauseModal, hidePauseModal, PauseModal] = useModal();
 
   const [gameRoomState, dispatch] = useReducer(reducer, initialState);
-  const { joined, started, paused, isHost, isReady, isGameOver, opponentNickname } = gameRoomState;
+  const { joined, playing, paused, isGameOver, opponentNickname } = gameRoomState;
 
   const handleStateChange = useCallback((k) => (v) => dispatch({ payload: { [k]: v } }), []);
-
   const handleResume = () => socketRef?.current?.emit('resume');
 
   useEffect(() => {
@@ -39,11 +40,11 @@ const GameRoom = () => {
     socket.on('full', () => navigate('/game/full'));
     socket.on('nickname', (opponentNickname) => dispatch({ payload: { opponentNickname } }));
     socket.on('isReady', (isReady) => dispatch({ payload: { isReady } }));
-    socket.on('start', () => dispatch({ payload: { started: true, isGameOver: false, isWinner: false } }));
+    socket.on('start', () => dispatch({ payload: { playing: true, isGameOver: false, isWinner: false } }));
     socket.on('item', (item) => receivePortalRef.current.addItem(item));
     socket.on('paused', (paused) => dispatch({ payload: { paused } }));
     socket.on('gameOver', (winner) => dispatch({ payload: { isGameOver: true, isWinner: nickname === winner } }));
-    socket.on('opponentLeft', () => dispatch({ payload: { started: false, isHost: true, opponentNickname: '' } }));
+    socket.on('opponentLeft', () => dispatch({ payload: { playing: false, isHost: true, opponentNickname: '' } }));
   }, [socketRef, gameRoomId, nickname, navigate]);
 
   useEffect(() => {
@@ -59,13 +60,11 @@ const GameRoom = () => {
       {!joined && <div>loading</div>}
       {joined && (
         <Wrapper>
-          <Timer started={started} paused={paused} />
+          <Timer playing={playing} paused={paused} />
+
           <Tetris
-            started={started}
-            setStarted={handleStateChange('started')}
-            paused={paused}
-            isHost={isHost}
-            isOpponentReady={isReady}
+            gameRoomState={gameRoomState}
+            setPlaying={handleStateChange('playing')}
             socketRef={socketRef}
             sendPortalRef={sendPortalRef}
           />
@@ -93,7 +92,7 @@ export default GameRoom;
 
 const initialState = {
   joined: false,
-  started: false,
+  playing: false,
   paused: false,
   isHost: false,
   isReady: false,
@@ -106,5 +105,4 @@ const reducer = (state, action) => ({ ...state, ...action.payload });
 
 const Wrapper = styled.div`
   display: flex;
-  //border: 3px solid purple;
 `;
