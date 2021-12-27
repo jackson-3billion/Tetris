@@ -14,9 +14,11 @@ import Opponent from '@components/Opponent';
 import Timer from '@components/Timer';
 import Button from '@components/Button';
 
+import { ARENA_HEIGHT, ARENA_WIDTH } from '@utils/constants';
+
 const GameRoom = () => {
   const {
-    actions: { setAccel },
+    actions: { setAccel, setExplodingPos, setCatJamming, setRotated },
   } = useContext(StatusContext);
 
   const navigate = useNavigate();
@@ -55,14 +57,22 @@ const GameRoom = () => {
       receivePortalRef.current.addItem(item);
       switch (item.name) {
         case 'faster':
-          setAccel((prevAccel) => prevAccel + 1);
-          break;
+          return setAccel((prevAccel) => prevAccel + 1);
         case 'bomb':
-          break;
+          return setExplodingPos({
+            y: Math.floor(Math.random() * (ARENA_HEIGHT / 2)) + 7,
+            x: Math.floor(Math.random() * (ARENA_WIDTH - 4)),
+          });
+        case 'catjam':
+          setCatJamming(true);
+          return setTimeout(() => setCatJamming(false), 5000);
+        case 'rotate':
+          setRotated(true);
+          return setTimeout(() => setRotated(false), 8000);
         default:
       }
     });
-  }, [socketRef, gameRoomId, nickname, navigate, setAccel]);
+  }, [socketRef, gameRoomId, nickname, navigate, setAccel, setExplodingPos, setCatJamming, setRotated]);
 
   useEffect(() => {
     paused ? openPauseModal() : hidePauseModal();
@@ -78,7 +88,6 @@ const GameRoom = () => {
       {joined && (
         <Wrapper>
           <Timer playing={playing} paused={paused} />
-
           <Tetris
             gameRoomState={gameRoomState}
             setPlaying={handleStateChange('playing')}
