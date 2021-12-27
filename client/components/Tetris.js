@@ -10,18 +10,27 @@ import useAnimationFrame from '@hooks/useAnimationFrame';
 import Arena from '@components/Arena';
 import Display from '@components/Display';
 import Button from '@components/Button';
+import CatJamGif from '@components/CatJam';
 
 import colors from '@utils/colors';
 import { createArena, checkCollision, removeOneRow } from '@utils/gameHelper';
-import { DROP_FAST, DROP_SLOW, DROP_PAUSED, LEFTWARD, RIGHTWARD, DOWNWARD, KEYHOLD_MAX_CNT } from '@utils/constants';
+import {
+  DROP_FAST,
+  DROP_SLOW,
+  DROP_PAUSED,
+  MIN_INTERVAL,
+  LEFTWARD,
+  RIGHTWARD,
+  DOWNWARD,
+  KEYHOLD_MAX_CNT,
+} from '@utils/constants';
 
 const Tetris = ({ gameRoomState, setPlaying, socketRef, sendPortalRef }) => {
   const { playing, paused, isHost, isReady: isOpponentReady } = gameRoomState;
 
   // context
   const { state, actions } = useContext(StatusContext);
-  const { level, speed, items } = state;
-  const { setSpeed } = actions;
+  const { level, items, accel, explodingPos, catJamming, rotated } = state;
 
   // local-state
   const [isReady, setIsReady] = useState(false); // guest 입장에서 필요 <-> isOpponentReady: host가 필요
@@ -34,6 +43,7 @@ const Tetris = ({ gameRoomState, setPlaying, socketRef, sendPortalRef }) => {
 
   // ref
   const focusRef = useRef();
+  const newIntervalRef = useRef(DROP_SLOW);
   const keyHoldCounterRef = useRef(0);
 
   const drop = useCallback(() => {
@@ -49,8 +59,41 @@ const Tetris = ({ gameRoomState, setPlaying, socketRef, sendPortalRef }) => {
   useEffect(() => focusRef.current.focus());
 
   useEffect(() => {
-    setSpeed(1000 - (level - 1) * 50);
-  }, [level, setSpeed]);
+    let newInterval = DROP_SLOW - (level - 1) * 50;
+    if (accel < 0) {
+      newInterval -= accel * 50;
+    }
+    if (accel > 0) {
+      const q = Math.floor((newInterval - MIN_INTERVAL) / 50);
+      newInterval -= Math.min(q, accel) * 50;
+    }
+
+    if (newInterval >= MIN_INTERVAL) {
+      setDropInterval((prevInterval) => {
+        if (prevInterval === 51) {
+          // 아래방향키 누르고 있는 중일때는 dropInterval 바꾸지 않는다.
+          newIntervalRef.current = newInterval;
+          return prevInterval;
+        }
+        return newInterval;
+      });
+    }
+  }, [level, accel, setDropInterval]);
+
+  useEffect(() => {
+    if (!explodingPos) {
+      setArena((prevArena) =>
+        prevArena.map((row) => row.map((cell) => (cell[2]?.name === 'fire' ? ['0', 'A'] : cell))),
+      );
+      setDropInterval(newIntervalRef.current);
+      return;
+    }
+    setDropInterval((prevInterval) => {
+      newIntervalRef.current = prevInterval;
+      return DROP_PAUSED;
+    });
+    //setTimeout(() => setDropInterval(newIntervalRef.current), 1000);
+  }, [explodingPos, setDropInterval, setArena]);
 
   // 게임 시작 및 재시작
   useEffect(() => {
@@ -64,12 +107,13 @@ const Tetris = ({ gameRoomState, setPlaying, socketRef, sendPortalRef }) => {
   useEffect(() => {
     if (!playing) return;
     if (paused) {
-      // TODO: save current drop-delay in dropIntervalRef
-      setDropInterval(DROP_PAUSED);
+      setDropInterval((prevInterval) => {
+        newIntervalRef.current = prevInterval;
+        return DROP_PAUSED;
+      });
     }
     if (!paused) {
-      // TODO: restore drop-delay saved in dropIntervalRef
-      setDropInterval(DROP_SLOW);
+      setDropInterval(newIntervalRef.current);
     }
   }, [paused, playing, setDropInterval]);
 
@@ -105,21 +149,20 @@ const Tetris = ({ gameRoomState, setPlaying, socketRef, sendPortalRef }) => {
       switch (item.name) {
         case 'star': // 자신에게 적용되는 아이템
           actions.setSparkling(true);
-          setTimeout(() => {
+          return setTimeout(() => {
             actions.setSparkling(false);
             removeOneRow(setArena, player);
           }, 500);
-          break;
         case 'slower': // 자신에게 적용되는 아이템
-          break;
+          return actions.setAccel((accel) => accel - 1);
         case 'bomb': // 상대에게 적용되는 아이템
-        case 'faster': // 상대에게 적용되는 아이템
-          setTimeout(() => {
+        case 'faster':
+        case 'catjam':
+        case 'rotate':
+          return setTimeout(() => {
             sendPortalRef.current.addItem(item);
             socket.emit('item', item);
-          }, attackItemCnt * 500);
-          ++attackItemCnt;
-          break;
+          }, attackItemCnt++ * 500);
         default:
           return;
       }
@@ -162,7 +205,7 @@ const Tetris = ({ gameRoomState, setPlaying, socketRef, sendPortalRef }) => {
       if (key !== 'ArrowDown') return;
       if (!playing || paused) return;
       cancelAnimation();
-      setDropInterval(DROP_SLOW);
+      setDropInterval(newIntervalRef.current);
     },
     [playing, paused, cancelAnimation, setDropInterval],
   );
@@ -184,7 +227,13 @@ const Tetris = ({ gameRoomState, setPlaying, socketRef, sendPortalRef }) => {
         if (checkCollision(arena, player, RIGHTWARD) || player.collided) return;
         return repeat ? handleKeyHold(movePlayer, RIGHTWARD) : movePlayer(RIGHTWARD);
       case 'ArrowDown':
-        return dropInterval === DROP_SLOW && setDropInterval(DROP_FAST);
+        if (dropInterval !== DROP_FAST) {
+          setDropInterval((prevInterval) => {
+            newIntervalRef.current = prevInterval;
+            return DROP_FAST;
+          });
+        }
+        break;
       case 'ArrowUp':
         return rotatePlayer(arena);
       case 'Spacebar':
@@ -215,10 +264,11 @@ const Tetris = ({ gameRoomState, setPlaying, socketRef, sendPortalRef }) => {
   return (
     <TetrisWrapper ref={focusRef} role="button" tabIndex="0" onKeyDown={handleKeyDown} onKeyUp={handleKeyUp}>
       <TetrisGame>
-        <Arena arena={arena} />
+        <Arena arena={arena} rotated={rotated} />
         <aside>
           <Display text={level} />
-          <Display text={speed} />
+          <Display text={dropInterval} />
+          <Display text={accel} />
           <Display text={playing ? 'playing' : 'game over'} />
           <Button callback={handleButtonClick} text={getButtonText()} color={getButtonColor()} />
           {playing && (
@@ -226,6 +276,7 @@ const Tetris = ({ gameRoomState, setPlaying, socketRef, sendPortalRef }) => {
           )}
         </aside>
       </TetrisGame>
+      {catJamming && <CatJamGif />}
     </TetrisWrapper>
   );
 };
@@ -233,10 +284,14 @@ const Tetris = ({ gameRoomState, setPlaying, socketRef, sendPortalRef }) => {
 export default Tetris;
 
 const TetrisWrapper = styled.div`
+  position: relative;
   width: 100vw;
   height: 100vh;
   background: gray;
   overflow: hidden;
+  &:focus {
+    outline: none;
+  }
 `;
 
 const TetrisGame = styled.div`

@@ -1,6 +1,8 @@
-import React, { useCallback, useEffect, useReducer, useRef } from 'react';
+import React, { useCallback, useEffect, useReducer, useRef, useContext } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import styled from '@emotion/styled';
+
+import StatusContext from '@contexts/status';
 
 import useSocket from '@hooks/useSocket';
 import useModal from '@hooks/useModal';
@@ -12,7 +14,13 @@ import Opponent from '@components/Opponent';
 import Timer from '@components/Timer';
 import Button from '@components/Button';
 
+import { ARENA_HEIGHT, ARENA_WIDTH } from '@utils/constants';
+
 const GameRoom = () => {
+  const {
+    actions: { setAccel, setExplodingPos, setCatJamming, setRotated },
+  } = useContext(StatusContext);
+
   const navigate = useNavigate();
   const { id: gameRoomId } = useParams();
   const { state: nickname } = useLocation();
@@ -41,11 +49,30 @@ const GameRoom = () => {
     socket.on('nickname', (opponentNickname) => dispatch({ payload: { opponentNickname } }));
     socket.on('isReady', (isReady) => dispatch({ payload: { isReady } }));
     socket.on('start', () => dispatch({ payload: { playing: true, isGameOver: false, isWinner: false } }));
-    socket.on('item', (item) => receivePortalRef.current.addItem(item));
     socket.on('paused', (paused) => dispatch({ payload: { paused } }));
     socket.on('gameOver', (winner) => dispatch({ payload: { isGameOver: true, isWinner: nickname === winner } }));
     socket.on('opponentLeft', () => dispatch({ payload: { playing: false, isHost: true, opponentNickname: '' } }));
-  }, [socketRef, gameRoomId, nickname, navigate]);
+
+    socket.on('item', (item) => {
+      receivePortalRef.current.addItem(item);
+      switch (item.name) {
+        case 'faster':
+          return setAccel((prevAccel) => prevAccel + 1);
+        case 'bomb':
+          return setExplodingPos({
+            y: Math.floor(Math.random() * (ARENA_HEIGHT / 2)) + 7,
+            x: Math.floor(Math.random() * (ARENA_WIDTH - 4)),
+          });
+        case 'catjam':
+          setCatJamming(true);
+          return setTimeout(() => setCatJamming(false), 5000);
+        case 'rotate':
+          setRotated(true);
+          return setTimeout(() => setRotated(false), 8000);
+        default:
+      }
+    });
+  }, [socketRef, gameRoomId, nickname, navigate, setAccel, setExplodingPos, setCatJamming, setRotated]);
 
   useEffect(() => {
     paused ? openPauseModal() : hidePauseModal();
@@ -61,7 +88,6 @@ const GameRoom = () => {
       {joined && (
         <Wrapper>
           <Timer playing={playing} paused={paused} />
-
           <Tetris
             gameRoomState={gameRoomState}
             setPlaying={handleStateChange('playing')}
