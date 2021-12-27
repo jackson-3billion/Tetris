@@ -2,13 +2,13 @@ import React from 'react';
 import { keyframes } from '@emotion/react';
 import styled from '@emotion/styled';
 
-import { itemMapper } from '@utils/items';
+import { iconMapper } from '@utils/items';
 
 const ItemToast = ({ name, isSending }) => {
   return (
     <Wrapper isSending={isSending}>
       <ToastBox isSending={isSending}>
-        <ToastIcon>{itemMapper[name]}</ToastIcon>
+        <ToastIcon>{iconMapper[name]}</ToastIcon>
       </ToastBox>
     </Wrapper>
   );
