@@ -4,13 +4,13 @@ import { keyframes, css } from '@emotion/react';
 import { lighten, darken } from 'polished';
 
 import { TETROMINOS } from '@utils/tetrominos';
-import { itemMapper } from '@utils/items';
+import { iconMapper } from '@utils/items';
 
-export const Cell = ({ type, item, sparkling }) => {
+export const Cell = ({ type, item, sparkling, exploding }) => {
   return (
     <CellBorder color={TETROMINOS[type].color}>
-      <StyledCell type={type} color={TETROMINOS[type].color} sparkling={sparkling}>
-        {item && itemMapper[item.name]}
+      <StyledCell type={type} color={TETROMINOS[type].color} sparkling={sparkling} exploding={exploding}>
+        {item && iconMapper[item.name]}
       </StyledCell>
     </CellBorder>
   );
@@ -25,6 +25,12 @@ const sparkle = keyframes`
  66.67% { background-color: green;  }
  83.33% { background-color: blue;   }
 100.00% { background-color: indigo; }
+`;
+
+const explode = keyframes`
+0% { fill: '#fb1239' }
+50% { fill: '#f05d14'; }
+100% { fill: orange; }
 `;
 
 const CellBorder = styled.div`
@@ -50,4 +56,12 @@ const StyledCell = styled.div`
       animation-timing-function: ease-in-out;
       animation-iteration-count: infinite;
     `}
+
+  & > svg path {
+    ${({ exploding }) =>
+      exploding &&
+      css`
+        animation: ${explode} 1s ease-in-out infinite alternate;
+      `}
+  }
 `;
