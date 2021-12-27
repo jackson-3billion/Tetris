@@ -1,19 +1,27 @@
 import React, { useContext } from 'react';
 import styled from '@emotion/styled';
+import { css } from '@emotion/react';
 
 import StatusContext from '@contexts/status';
 
 import Cell from './Cell';
 
-const Arena = ({ arena }) => {
+const Arena = ({ arena, rotated }) => {
   const { state } = useContext(StatusContext);
   const checkSparkling = (type, y) => state.sparkling && type !== '0' && y === arena.length - 1;
+  const checkExploding = (item) => state.explodingPos && item && item.name === 'fire';
 
   return (
-    <StyledArena width={arena[0].length} height={arena.length}>
+    <StyledArena width={arena[0].length} height={arena.length} rotated={rotated}>
       {arena.map((row, y) =>
         row.map(([type, , item], idx) => (
-          <Cell key={idx} type={type} item={item} sparkling={checkSparkling(type, y)} />
+          <Cell
+            key={idx}
+            type={type}
+            item={item}
+            sparkling={checkSparkling(type, y)}
+            exploding={checkExploding(item)}
+          />
         )),
       )}
     </StyledArena>
@@ -34,4 +42,12 @@ const StyledArena = styled.div`
   width: 100%;
   max-width: 25vw;
   background: #111;
+
+  ${({ rotated }) =>
+    rotated &&
+    css`
+      transform: rotate(-180deg);
+      transition: transform 300ms ease-in-out;
+    `}
+  transition: transform 300ms ease-in-out;
 `;
