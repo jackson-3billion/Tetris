@@ -7,7 +7,10 @@ import { ARENA_HEIGHT, ARENA_WIDTH } from '@utils/constants';
 
 const useArena = (player, resetPlayer, setPlaying) => {
   const [arena, setArena] = useState(createArena());
-  const { actions } = useContext(StatusContext);
+  const {
+    state: { explodingPos },
+    actions,
+  } = useContext(StatusContext);
 
   useEffect(() => {
     setArena((prevArena) => {
@@ -52,6 +55,27 @@ const useArena = (player, resetPlayer, setPlaying) => {
       return [...newEmptyRows, ...newArena];
     });
   }, [player, resetPlayer, setPlaying, actions]);
+
+  useEffect(() => {
+    if (!explodingPos) return;
+    const { y, x } = explodingPos;
+    setArena((prevArena) => {
+      const newArena = prevArena.map((row) => row);
+      for (let i = 0; i < 4; i++) {
+        for (let j = 0; j < 4; j++) {
+          newArena[y + i][x + j] = ['0', 'A', { name: 'fire' }];
+        }
+      }
+
+      newArena[y][x] = ['0', 'A'];
+      newArena[y][x + 3] = ['0', 'A'];
+      newArena[y + 3][x] = ['0', 'A'];
+      newArena[y + 3][x + 3] = ['0', 'A'];
+
+      return newArena;
+    });
+    setTimeout(() => actions.setExplodingPos(null), 1000);
+  }, [explodingPos, actions]);
 
   return [arena, setArena];
 };
