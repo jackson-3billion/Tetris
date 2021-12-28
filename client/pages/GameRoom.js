@@ -18,7 +18,7 @@ import { ARENA_HEIGHT, ARENA_WIDTH } from '@utils/constants';
 
 const GameRoom = () => {
   const {
-    actions: { setAccel, setExplodingPos, setCatJamming, setRotated },
+    actions: { setAccel, setExplodingPos, setCatJamming, setRotated, setFlipped },
   } = useContext(StatusContext);
 
   const navigate = useNavigate();
@@ -37,6 +37,15 @@ const GameRoom = () => {
 
   const handleStateChange = useCallback((k) => (v) => dispatch({ payload: { [k]: v } }), []);
   const handleResume = () => socketRef?.current?.emit('resume');
+
+  const activateItem = useCallback((setter, delay) => {
+    setter((activated) => {
+      if (!activated) {
+        setTimeout(() => setter(false), delay);
+      }
+      return true;
+    });
+  }, []);
 
   useEffect(() => {
     if (!socketRef?.current) return;
@@ -64,15 +73,26 @@ const GameRoom = () => {
             x: Math.floor(Math.random() * (ARENA_WIDTH - 4)),
           });
         case 'catjam':
-          setCatJamming(true);
-          return setTimeout(() => setCatJamming(false), 5000);
+          return activateItem(setCatJamming, 5000);
         case 'rotate':
-          setRotated(true);
-          return setTimeout(() => setRotated(false), 8000);
+          return activateItem(setRotated, 8000);
+        case 'flip':
+          return activateItem(setFlipped, 8000);
         default:
       }
     });
-  }, [socketRef, gameRoomId, nickname, navigate, setAccel, setExplodingPos, setCatJamming, setRotated]);
+  }, [
+    socketRef,
+    gameRoomId,
+    nickname,
+    navigate,
+    activateItem,
+    setAccel,
+    setExplodingPos,
+    setCatJamming,
+    setRotated,
+    setFlipped,
+  ]);
 
   useEffect(() => {
     paused ? openPauseModal() : hidePauseModal();

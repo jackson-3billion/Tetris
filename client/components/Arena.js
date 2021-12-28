@@ -6,13 +6,13 @@ import StatusContext from '@contexts/status';
 
 import Cell from './Cell';
 
-const Arena = ({ arena, rotated }) => {
+const Arena = ({ arena, rotated, flipped }) => {
   const { state } = useContext(StatusContext);
   const checkSparkling = (type, y) => state.sparkling && type !== '0' && y === arena.length - 1;
   const checkExploding = (item) => state.explodingPos && item && item.name === 'fire';
 
   return (
-    <StyledArena width={arena[0].length} height={arena.length} rotated={rotated}>
+    <StyledArena width={arena[0].length} height={arena.length} rotated={rotated} flipped={flipped}>
       {arena.map((row, y) =>
         row.map(([type, , item], idx) => (
           <Cell
@@ -38,16 +38,20 @@ const StyledArena = styled.div`
   );
   grid-template-columns: repeat(${({ width }) => width}, 1fr);
   grid-gap: 1px;
-  //border: 2px solid #333;
   width: 100%;
   max-width: 25vw;
   background: #111;
+  transition: transform 500ms ease-in-out;
 
   ${({ rotated }) =>
     rotated &&
     css`
       transform: rotate(-180deg);
-      transition: transform 300ms ease-in-out;
     `}
-  transition: transform 300ms ease-in-out;
+
+  ${({ flipped }) =>
+    flipped &&
+    css`
+      transform: rotateY(180deg);
+    `}
 `;

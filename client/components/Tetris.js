@@ -30,7 +30,7 @@ const Tetris = ({ gameRoomState, setPlaying, socketRef, sendPortalRef }) => {
 
   // context
   const { state, actions } = useContext(StatusContext);
-  const { level, items, accel, explodingPos, catJamming, rotated } = state;
+  const { level, items, accel, explodingPos, catJamming, rotated, flipped } = state;
 
   // local-state
   const [isReady, setIsReady] = useState(false); // guest 입장에서 필요 <-> isOpponentReady: host가 필요
@@ -48,6 +48,7 @@ const Tetris = ({ gameRoomState, setPlaying, socketRef, sendPortalRef }) => {
 
   const drop = useCallback(() => {
     if (checkCollision(arena, player, DOWNWARD)) {
+      // useArena에서 checkCollision return 하도록 바꿔보자
       if (player.pos.y <= 1) {
         return setPlaying(false);
       }
@@ -58,6 +59,7 @@ const Tetris = ({ gameRoomState, setPlaying, socketRef, sendPortalRef }) => {
 
   useEffect(() => focusRef.current.focus());
 
+  // hook으로 빼낼 수 있을 듯
   useEffect(() => {
     let newInterval = DROP_SLOW - (level - 1) * 50;
     if (accel < 0) {
@@ -80,6 +82,7 @@ const Tetris = ({ gameRoomState, setPlaying, socketRef, sendPortalRef }) => {
     }
   }, [level, accel, setDropInterval]);
 
+  //  hook 으로 분리해보자
   useEffect(() => {
     if (!explodingPos) {
       setArena((prevArena) =>
@@ -159,6 +162,7 @@ const Tetris = ({ gameRoomState, setPlaying, socketRef, sendPortalRef }) => {
         case 'faster':
         case 'catjam':
         case 'rotate':
+        case 'flip':
           return setTimeout(() => {
             sendPortalRef.current.addItem(item);
             socket.emit('item', item);
@@ -264,7 +268,7 @@ const Tetris = ({ gameRoomState, setPlaying, socketRef, sendPortalRef }) => {
   return (
     <TetrisWrapper ref={focusRef} role="button" tabIndex="0" onKeyDown={handleKeyDown} onKeyUp={handleKeyUp}>
       <TetrisGame>
-        <Arena arena={arena} rotated={rotated} />
+        <Arena arena={arena} rotated={rotated} flipped={flipped} />
         <aside>
           <Display text={level} />
           <Display text={dropInterval} />
