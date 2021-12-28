@@ -2,6 +2,7 @@ import React from 'react';
 import { FaForward, FaBackward, FaStar, FaBomb, FaFireAlt } from 'react-icons/fa';
 import { IoLogoOctocat } from 'react-icons/io';
 import { GrRotateLeft } from 'react-icons/gr';
+import { MdFlip } from 'react-icons/md';
 
 const ITEM_CHANCE = 0.2;
 const ITEMS = [
@@ -29,6 +30,10 @@ const ITEMS = [
     name: 'rotate',
     description: '화면이 180도 회전합니다.',
   },
+  {
+    name: 'flip',
+    description: '화면의 좌우가 반전됩니다.',
+  },
 ];
 
 export const getRandomItem = () => {
@@ -39,10 +44,11 @@ export const getRandomItem = () => {
 
 export const iconMapper = {
   bomb: <FaBomb color="black" size="80%" />,
+  fire: <FaFireAlt color="red" size="80%" />,
   star: <FaStar color="yellow" size="80%" />,
   faster: <FaForward color="#DC143C" size="80%" />,
   slower: <FaBackward color="#008800" size="80%" />,
-  fire: <FaFireAlt color="red" size="80%" />,
   catjam: <IoLogoOctocat color="white" size="80%" />,
-  rotate: <GrRotateLeft color="#008AC2" size="80%" />,
+  rotate: <GrRotateLeft color="black" size="80%" />,
+  flip: <MdFlip color="black" size="80%" />,
 };
