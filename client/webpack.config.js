@@ -54,6 +54,12 @@ const config = {
         test: /\.css?$/,
         use: ['style-loader', 'css-loader'],
       },
+      {
+        test: /\.(woff|woff2)$/,
+        use: {
+          loader: 'url-loader',
+        },
+      },
     ],
   },
   plugins: [new webpack.EnvironmentPlugin({ NODE_ENV: isDevelopment ? 'development' : 'production' })],
