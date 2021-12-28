@@ -6,7 +6,7 @@ import { keyframes } from '@emotion/react';
 const CatJam = () => {
   return createPortal(
     <CatJamGif src="https://media2.giphy.com/media/JVglf7QjxaZZM2tjfB/giphy.gif" />,
-    document.getElementById('cat-jam'),
+    document.getElementById('cat-jam-portal'),
   );
 };
 

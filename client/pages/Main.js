@@ -5,12 +5,14 @@ import { darken } from 'polished';
 
 import { rankList } from '@utils/dummy';
 
+import Logo from '@components/Logo';
+
 const ordinalMapper = ['st', 'nd', 'rd', 'th', 'th'];
 
 const Main = () => {
   return (
     <Wrapper>
-      <Title>Tetris </Title>
+      <Logo />
       <RankList>
         {rankList.map(({ score, nickname }, idx) => (
           <RankItem key={idx}>
@@ -43,13 +45,8 @@ const Wrapper = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background-color: #191919;
+  background-color: black;
   color: #f6f7fb;
-`;
-
-const Title = styled.div`
-  margin-top: -10%;
-  font-size: 10rem;
 `;
 
 const RankList = styled.div`
