@@ -50,7 +50,7 @@ io.on('connection', socket => {
 
     socket.on('start', () => io.to(gameRoomId).emit('start', true));
 
-    socket.on('item', item => socket.broadcast.to(gameRoomId).emit('item', item));
+    socket.on('item', item => io.to(gameRoomId).emit('item', { sender: socket.id, ...item }));
 
     socket.on('paused', () => io.to(gameRoomId).emit('paused', true));
 
