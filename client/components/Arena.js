@@ -1,34 +1,46 @@
-import React, { useContext } from 'react';
+import React, { useCallback } from 'react';
 import styled from '@emotion/styled';
 import { css } from '@emotion/react';
 
-import StatusContext from '@contexts/status';
+import { ARENA_HEIGHT, ARENA_WIDTH } from '@utils/constants';
 
-import Cell from './Cell';
+import Cell from '@components/Cell';
 
-const Arena = ({ arena, rotated, flipped }) => {
-  const { state } = useContext(StatusContext);
-  const checkSparkling = (type, y) => state.sparkling && type !== '0' && y === arena.length - 1;
-  const checkExploding = (item) => state.explodingPos && item && item.name === 'fire';
+const Arena = ({ arena, rotated, flipped, explodingPos }) => {
+  const checkExploding = useCallback((item) => item && item.name === 'fire', []);
 
   return (
-    <StyledArena width={arena[0].length} height={arena.length} rotated={rotated} flipped={flipped}>
-      {arena.map((row, y) =>
-        row.map(([type, , item], idx) => (
-          <Cell
-            key={idx}
-            type={type}
-            item={item}
-            sparkling={checkSparkling(type, y)}
-            exploding={checkExploding(item)}
-          />
-        )),
-      )}
-    </StyledArena>
+    <Wrapper flipped={flipped}>
+      <StyledArena width={ARENA_WIDTH} height={ARENA_HEIGHT} rotated={rotated}>
+        {arena.map((row, y) =>
+          row.map(([type, , item], idx) => (
+            <Cell
+              key={idx}
+              type={type}
+              item={item}
+              sparkling={item && item.sparkling}
+              exploding={explodingPos && checkExploding(item)}
+            />
+          )),
+        )}
+      </StyledArena>
+    </Wrapper>
   );
 };
 
 export default Arena;
+
+const Wrapper = styled.div`
+  width: 100%;
+  max-width: 25vw;
+  transition: transform 500ms ease-in-out;
+
+  ${({ flipped }) =>
+    flipped &&
+    css`
+      transform: rotateY(180deg);
+    `}
+`;
 
 const StyledArena = styled.div`
   display: grid;
@@ -47,11 +59,5 @@ const StyledArena = styled.div`
     rotated &&
     css`
       transform: rotate(-180deg);
-    `}
-
-  ${({ flipped }) =>
-    flipped &&
-    css`
-      transform: rotateY(180deg);
     `}
 `;
