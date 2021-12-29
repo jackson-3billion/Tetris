@@ -8,6 +8,7 @@ const usePlayer = () => {
   const [player, setPlayer] = useState({
     pos: PLAYER_INITIAL_POS,
     tetromino: TETROMINOS['0'],
+    next: randomTetromino(),
     collided: false,
   });
 
@@ -22,11 +23,12 @@ const usePlayer = () => {
   };
 
   const resetPlayer = useCallback(() => {
-    setPlayer({
+    setPlayer((prevPlayer) => ({
       pos: { ...PLAYER_INITIAL_POS },
-      tetromino: randomTetromino(),
+      tetromino: prevPlayer.next,
+      next: randomTetromino(),
       collided: false,
-    });
+    }));
   }, []);
 
   const rotatePlayer = (arena) => {
