@@ -8,6 +8,7 @@ import usePlayer from '@hooks/usePlayer';
 import useAnimationFrame from '@hooks/useAnimationFrame';
 
 import Arena from '@components/Arena';
+import Preview from '@components/Preview';
 import Display from '@components/Display';
 import Button from '@components/Button';
 import CatJamGif from '@components/CatJam';
@@ -30,7 +31,7 @@ const Tetris = ({ gameRoomState, setPlaying, socketRef, sendPortalRef }) => {
 
   // context
   const { state, actions } = useContext(StatusContext);
-  const { level, items, accel, explodingPos, catJamming, rotated, flipped } = state;
+  const { level, items, accel, explodingPos, catJamming } = state;
 
   // local-state
   const [isReady, setIsReady] = useState(false); // guest 입장에서 필요 <-> isOpponentReady: host가 필요
@@ -45,6 +46,7 @@ const Tetris = ({ gameRoomState, setPlaying, socketRef, sendPortalRef }) => {
   const focusRef = useRef();
   const newIntervalRef = useRef(DROP_SLOW);
   const keyHoldCounterRef = useRef(0);
+  const catJamBgmRef = useRef(new Audio('../bgms/cat-jam.mp3'));
 
   const drop = useCallback(() => {
     if (checkCollision(arena, player, DOWNWARD)) {
@@ -72,7 +74,7 @@ const Tetris = ({ gameRoomState, setPlaying, socketRef, sendPortalRef }) => {
 
     if (newInterval >= MIN_INTERVAL) {
       setDropInterval((prevInterval) => {
-        if (prevInterval === 51) {
+        if (prevInterval === DROP_FAST) {
           // 아래방향키 누르고 있는 중일때는 dropInterval 바꾸지 않는다.
           newIntervalRef.current = newInterval;
           return prevInterval;
@@ -110,6 +112,7 @@ const Tetris = ({ gameRoomState, setPlaying, socketRef, sendPortalRef }) => {
   useEffect(() => {
     if (!playing) return;
     if (paused) {
+      cancelAnimation();
       setDropInterval((prevInterval) => {
         newIntervalRef.current = prevInterval;
         return DROP_PAUSED;
@@ -118,7 +121,7 @@ const Tetris = ({ gameRoomState, setPlaying, socketRef, sendPortalRef }) => {
     if (!paused) {
       setDropInterval(newIntervalRef.current);
     }
-  }, [paused, playing, setDropInterval]);
+  }, [paused, playing, setDropInterval, cancelAnimation]);
 
   // 사용자의 화면 변경사항을 상대에게 전송
   useEffect(() => {
@@ -151,9 +154,17 @@ const Tetris = ({ gameRoomState, setPlaying, socketRef, sendPortalRef }) => {
       const item = items.pop();
       switch (item.name) {
         case 'star': // 자신에게 적용되는 아이템
-          actions.setSparkling(true);
+          setArena((prevArena) => {
+            const newArena = prevArena.map((row) => row);
+            for (let i = 0; i < prevArena[0].length; i++) {
+              const cell = newArena[prevArena.length - 1][i];
+              if (cell[0] !== '0') {
+                cell[2] = cell[2] ? { ...cell[2], sparkling: true } : { sparkling: true };
+              }
+            }
+            return newArena;
+          });
           return setTimeout(() => {
-            actions.setSparkling(false);
             removeOneRow(setArena, player);
           }, 500);
         case 'slower': // 자신에게 적용되는 아이템
@@ -233,7 +244,9 @@ const Tetris = ({ gameRoomState, setPlaying, socketRef, sendPortalRef }) => {
       case 'ArrowDown':
         if (dropInterval !== DROP_FAST) {
           setDropInterval((prevInterval) => {
-            newIntervalRef.current = prevInterval;
+            if (prevInterval !== DROP_FAST) {
+              newIntervalRef.current = prevInterval;
+            }
             return DROP_FAST;
           });
         }
@@ -268,8 +281,9 @@ const Tetris = ({ gameRoomState, setPlaying, socketRef, sendPortalRef }) => {
   return (
     <TetrisWrapper ref={focusRef} role="button" tabIndex="0" onKeyDown={handleKeyDown} onKeyUp={handleKeyUp}>
       <TetrisGame>
-        <Arena arena={arena} rotated={rotated} flipped={flipped} />
+        <Arena arena={arena} {...state} />
         <aside>
+          <Preview tetromino={player.next.preview} />
           <Display text={level} />
           <Display text={dropInterval} />
           <Display text={accel} />
@@ -280,7 +294,7 @@ const Tetris = ({ gameRoomState, setPlaying, socketRef, sendPortalRef }) => {
           )}
         </aside>
       </TetrisGame>
-      {catJamming && <CatJamGif />}
+      {catJamming && <CatJamGif catJamBgmRef={catJamBgmRef} isOpponent={false} />}
     </TetrisWrapper>
   );
 };
@@ -307,7 +321,7 @@ const TetrisGame = styled.div`
 
   aside {
     //width: 100%;
-    max-width: 200px;
+    width: 150px;
     display: block;
     padding: 0 20px;
   }
