@@ -43,7 +43,11 @@ const useArena = (player, resetPlayer, setPlaying) => {
         newArena.splice(line, 1);
       });
 
-      const uniqueItems = items.filter((item, idx) => items.findIndex((el) => el.name === item.name) === idx);
+      let uniqueItems = items.filter((item, idx) => items.findIndex((el) => el.name === item.name) === idx);
+      const flipItemIdx = items.findIndex(({ name }) => name === 'flip');
+      if (flipItemIdx !== -1) {
+        uniqueItems = [...uniqueItems.splice(flipItemIdx, 1), ...uniqueItems];
+      }
 
       uniqueItems.length && setTimeout(() => actions.setItems([...uniqueItems]), 0);
       const newEmptyRows = Array.from(Array(rowsToSweep.length), () => new Array(ARENA_WIDTH).fill(['0', 'A']));
