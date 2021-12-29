@@ -3,6 +3,7 @@ import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import styled from '@emotion/styled';
 
 import StatusContext from '@contexts/status';
+import OpponentStatusContext from '@contexts/opponentStatus';
 
 import useSocket from '@hooks/useSocket';
 import useModal from '@hooks/useModal';
@@ -18,8 +19,13 @@ import { ARENA_HEIGHT, ARENA_WIDTH } from '@utils/constants';
 
 const GameRoom = () => {
   const {
-    actions: { setAccel, setExplodingPos, setCatJamming, setRotated, setFlipped },
+    // actions: { setAccel, setExplodingPos, setCatJamming, setRotated, setFlipped },
+    actions,
   } = useContext(StatusContext);
+  const { actions: oppActions } = useContext(OpponentStatusContext);
+
+  const actionsRef = useRef(actions);
+  const oopActionsRef = useRef(oppActions);
 
   const navigate = useNavigate();
   const { id: gameRoomId } = useParams();
@@ -63,36 +69,48 @@ const GameRoom = () => {
     socket.on('opponentLeft', () => dispatch({ payload: { playing: false, isHost: true, opponentNickname: '' } }));
 
     socket.on('item', (item) => {
-      receivePortalRef.current.addItem(item);
-      switch (item.name) {
-        case 'faster':
-          return setAccel((prevAccel) => prevAccel + 1);
-        case 'bomb':
-          return setExplodingPos({
-            y: Math.floor(Math.random() * (ARENA_HEIGHT / 2)) + 7,
-            x: Math.floor(Math.random() * (ARENA_WIDTH - 4)),
-          });
-        case 'catjam':
-          return activateItem(setCatJamming, 5000);
-        case 'rotate':
-          return activateItem(setRotated, 8000);
-        case 'flip':
-          return activateItem(setFlipped, 8000);
-        default:
+      const fromOpponent = item.sender !== socket.id;
+      const aRef = actionsRef.current;
+
+      if (fromOpponent) {
+        receivePortalRef.current.addItem(item);
+        switch (item.name) {
+          // description 표시
+          case 'faster':
+            return aRef.setAccel((prevAccel) => prevAccel + 1);
+          case 'bomb':
+            return aRef.setExplodingPos({
+              y: Math.floor(Math.random() * (ARENA_HEIGHT / 2)) + 7,
+              x: Math.floor(Math.random() * (ARENA_WIDTH - 4)),
+            });
+          case 'catjam':
+            return activateItem(aRef.setCatJamming, 9500);
+          case 'rotate':
+            return activateItem(aRef.setRotated, 8000);
+          case 'flip':
+            return activateItem(aRef.setFlipped, 8000);
+          default:
+        }
+      }
+
+      const oRef = oopActionsRef.current;
+
+      if (!fromOpponent) {
+        switch (item.name) {
+          // description 표시 ? opponent 는 안해도 될듯
+          case 'bomb':
+            return activateItem(oRef.setExplodingPos, 1000);
+          case 'catjam':
+            return activateItem(oRef.setCatJamming, 9500);
+          case 'rotate':
+            return activateItem(oRef.setRotated, 8000);
+          case 'flip':
+            return activateItem(oRef.setFlipped, 8000);
+          default:
+        }
       }
     });
-  }, [
-    socketRef,
-    gameRoomId,
-    nickname,
-    navigate,
-    activateItem,
-    setAccel,
-    setExplodingPos,
-    setCatJamming,
-    setRotated,
-    setFlipped,
-  ]);
+  }, [socketRef, gameRoomId, nickname, navigate, activateItem]);
 
   useEffect(() => {
     paused ? openPauseModal() : hidePauseModal();

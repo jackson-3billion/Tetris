@@ -1,14 +1,19 @@
-import React, { useState, useEffect, memo } from 'react';
+import React, { useState, useEffect, useContext, memo } from 'react';
 import styled from '@emotion/styled';
+
+import OpponentStatusContext from '@contexts/opponentStatus';
 
 import Arena from '@components/Arena';
 import Display from '@components/Display';
+import CatJam from '@components/CatJam';
 
 import useMounted from '@hooks/useMounted';
 
 import { createArena } from '@utils/gameHelper';
 
-const Opponent = ({ socketRef, opponentNickname }) => {
+const Opponent = ({ socketRef, catJamBgmRef, opponentNickname }) => {
+  const { state } = useContext(OpponentStatusContext);
+
   const [arena, setArena] = useState(createArena());
   const mounted = useMounted();
 
@@ -25,11 +30,12 @@ const Opponent = ({ socketRef, opponentNickname }) => {
   return (
     <TetrisWrapper>
       <TetrisGame>
-        <Arena arena={arena} />
+        <Arena arena={arena} {...state} />
         <aside>
           <Display text={opponentNickname ? opponentNickname : 'waiting'} />
         </aside>
       </TetrisGame>
+      {state.catJamming && <CatJam catJamBgmRef={catJamBgmRef} isOpponent={true} />}
     </TetrisWrapper>
   );
 };

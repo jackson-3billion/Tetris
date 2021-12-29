@@ -6,6 +6,7 @@ import neonregular2 from './fonts/neon-webfont.woff2';
 import neonregular from './fonts/neon-webfont.woff';
 
 import { StatusProvider } from '@contexts/status';
+import { OpponentStatusProvider } from '@contexts/opponentStatus';
 
 import App from '@layouts/App';
 
@@ -21,8 +22,10 @@ const styles = css`
 render(
   <BrowserRouter>
     <StatusProvider>
-      <Global styles={styles} />
-      <App />
+      <OpponentStatusProvider>
+        <Global styles={styles} />
+        <App />
+      </OpponentStatusProvider>
     </StatusProvider>
   </BrowserRouter>,
   document.getElementById('app'),
