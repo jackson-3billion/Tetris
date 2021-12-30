@@ -1,11 +1,14 @@
-require('dotenv').config();
 const app = require('express')();
-const cors = require('cors');
+//const cors = require('cors');
 const http = require('http');
 const server = http.createServer(app);
 const { Server } = require('socket.io');
 
-app.use(cors());
+if (process.env.NODE_ENV === 'development') {
+  require('dotenv').config({ path: './.env.dev' });
+}
+
+//app.use(cors());
 
 app.get('/', (req, res) => {
   res.send('Hello World!');
@@ -22,7 +25,6 @@ const io = new Server(server, {
     methods: ['GET', 'POST'],
   },
 });
-const PORT = 9000;
 
 io.on('connection', socket => {
   socket.on('join', gameRoomId => {
@@ -76,4 +78,4 @@ const getPlayerNum = (io, roomId) => {
   return joinedPlayers ? joinedPlayers.size : 0;
 };
 
-server.listen(process.env.PORT || PORT, () => console.log(`listening on port: ${process.env.PORT || PORT}`));
+server.listen(process.env.PORT, () => console.log(`listening on port: ${process.env.PORT}`));
