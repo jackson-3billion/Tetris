@@ -63,10 +63,7 @@ const config = {
       },
     ],
   },
-  plugins: [
-    new Dotenv({ path: isDevelopment ? './.env.dev' : './.env' }),
-    new webpack.EnvironmentPlugin({ NODE_ENV: isDevelopment ? 'development' : 'production' }),
-  ],
+  plugins: [new webpack.EnvironmentPlugin({ NODE_ENV: isDevelopment ? 'development' : 'production' })],
   output: {
     path: path.join(__dirname, 'dist'),
     filename: '[name].js',
@@ -89,6 +86,7 @@ if (isDevelopment && config.plugins) {
   config.plugins.push(new webpack.HotModuleReplacementPlugin());
   config.plugins.push(new ReactRefreshWebpackPlugin());
   config.plugins.push(new BundleAnalyzerPlugin({ analyzerMode: 'server', openAnalyzer: false }));
+  config.plugins.push(new Dotenv({ path: './.env.dev' }));
 }
 if (!isDevelopment && config.plugins) {
   config.plugins.push(new webpack.LoaderOptionsPlugin({ minimize: true }));
