@@ -21,7 +21,7 @@ app.get('/', (req, res) => {
 
 const io = new Server(server, {
   cors: {
-    origin: 'http://localhost:2000',
+    origin: process.env.CLIENT_URL,
     methods: ['GET', 'POST'],
   },
 });
