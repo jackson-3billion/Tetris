@@ -7,10 +7,14 @@ const { Server } = require('socket.io');
 
 app.use(cors());
 
-const db = require('./db');
-db.query('select * from player', (_, rows) => {
-  console.log(rows);
+app.get('/', (req, res) => {
+  res.send('Hello World!');
 });
+
+// const db = require('./db');
+// db.query('select * from player', (_, rows) => {
+//   console.log(rows);
+// });
 
 const io = new Server(server, {
   cors: {
