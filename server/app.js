@@ -1,8 +1,11 @@
 require('dotenv').config();
 const app = require('express')();
+const cors = require('cors');
 const http = require('http');
 const server = http.createServer(app);
 const { Server } = require('socket.io');
+
+app.use(cors());
 
 const db = require('./db');
 db.query('select * from player', (_, rows) => {
