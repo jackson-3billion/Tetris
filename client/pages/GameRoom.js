@@ -31,7 +31,7 @@ const GameRoom = () => {
   const { id: gameRoomId } = useParams();
   const { state: nickname } = useLocation();
 
-  const socketRef = useSocket(`http://localhost:9000`);
+  const socketRef = useSocket(`${process.env.SERVER_URL}`);
   const sendPortalRef = useRef();
   const receivePortalRef = useRef();
 

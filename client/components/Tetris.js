@@ -94,7 +94,9 @@ const Tetris = ({ gameRoomState, setPlaying, socketRef, sendPortalRef }) => {
       return;
     }
     setDropInterval((prevInterval) => {
-      newIntervalRef.current = prevInterval;
+      if (prevInterval !== DROP_FAST) {
+        newIntervalRef.current = prevInterval;
+      }
       return DROP_PAUSED;
     });
     //setTimeout(() => setDropInterval(newIntervalRef.current), 1000);
@@ -149,7 +151,7 @@ const Tetris = ({ gameRoomState, setPlaying, socketRef, sendPortalRef }) => {
   useEffect(() => {
     const socket = socketRef.current;
     let attackItemCnt = 0;
-    console.log('here');
+
     while (items.length) {
       const item = items.pop();
       switch (item.name) {

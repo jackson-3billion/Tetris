@@ -28,9 +28,9 @@ const sparkle = keyframes`
 `;
 
 const explode = keyframes`
-0% { fill: '#fb1239' }
+0% { fill: yellow }
 50% { fill: '#f05d14'; }
-100% { fill: orange; }
+100% { fill: '#fb1239'; }
 `;
 
 const CellBorder = styled.div`
@@ -61,7 +61,7 @@ const StyledCell = styled.div`
     ${({ exploding }) =>
       exploding &&
       css`
-        animation: ${explode} 1s ease-in-out infinite alternate;
+        animation: ${explode} 0.2s ease-in-out infinite alternate;
       `}
   }
 `;
