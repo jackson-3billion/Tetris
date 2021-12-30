@@ -1,6 +1,7 @@
 const path = require('path');
 const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
 const webpack = require('webpack');
+const Dotenv = require('dotenv-webpack');
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 
 const isDevelopment = process.env.NODE_ENV !== 'production';
@@ -62,7 +63,10 @@ const config = {
       },
     ],
   },
-  plugins: [new webpack.EnvironmentPlugin({ NODE_ENV: isDevelopment ? 'development' : 'production' })],
+  plugins: [
+    new Dotenv({ path: isDevelopment ? './.env.dev' : './.env' }),
+    new webpack.EnvironmentPlugin({ NODE_ENV: isDevelopment ? 'development' : 'production' }),
+  ],
   output: {
     path: path.join(__dirname, 'dist'),
     filename: '[name].js',
