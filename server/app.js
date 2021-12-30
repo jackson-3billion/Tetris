@@ -76,4 +76,4 @@ const getPlayerNum = (io, roomId) => {
   return joinedPlayers ? joinedPlayers.size : 0;
 };
 
-server.listen(PORT, () => console.log(`listening on port: ${PORT}`));
+server.listen(process.env.PORT || PORT, () => console.log(`listening on port: ${process.env.PORT || PORT}`));
