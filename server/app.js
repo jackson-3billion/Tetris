@@ -4,10 +4,10 @@ const http = require('http');
 const server = http.createServer(app);
 const { Server } = require('socket.io');
 
-//const db = require('./db');
-//db.query('select * from player', (_, rows) => {
-//  console.log(rows);
-//});
+const db = require('./db');
+db.query('select * from player', (_, rows) => {
+  console.log(rows);
+});
 
 const io = new Server(server, {
   cors: {
