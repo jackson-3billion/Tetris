@@ -90,8 +90,7 @@ const Tetris = ({ gameRoomState, setPlaying, socketRef, sendPortalRef }) => {
       setArena((prevArena) =>
         prevArena.map((row) => row.map((cell) => (cell[2]?.name === 'fire' ? ['0', 'A'] : cell))),
       );
-      setDropInterval(newIntervalRef.current);
-      return;
+      return setDropInterval(newIntervalRef.current);
     }
     setDropInterval((prevInterval) => {
       if (prevInterval !== DROP_FAST) {
@@ -99,14 +98,12 @@ const Tetris = ({ gameRoomState, setPlaying, socketRef, sendPortalRef }) => {
       }
       return DROP_PAUSED;
     });
-    //setTimeout(() => setDropInterval(newIntervalRef.current), 1000);
   }, [explodingPos, setDropInterval, setArena]);
 
   // 게임 시작 및 재시작
   useEffect(() => {
     if (playing) {
       setArena(createArena());
-      // resetDropInterval
       resetPlayer();
     }
   }, [playing, setArena, resetPlayer]);
@@ -116,7 +113,9 @@ const Tetris = ({ gameRoomState, setPlaying, socketRef, sendPortalRef }) => {
     if (paused) {
       cancelAnimation();
       setDropInterval((prevInterval) => {
-        newIntervalRef.current = prevInterval;
+        if (prevInterval !== DROP_FAST) {
+          newIntervalRef.current = prevInterval;
+        }
         return DROP_PAUSED;
       });
     }
@@ -307,7 +306,7 @@ const TetrisWrapper = styled.div`
   position: relative;
   width: 100vw;
   height: 100vh;
-  background: gray;
+  //background: gray;
   overflow: hidden;
   &:focus {
     outline: none;
