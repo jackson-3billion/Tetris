@@ -4,8 +4,6 @@ import loadable from '@loadable/component';
 
 import Room from '@layouts/Room';
 
-import Snowfall from '@components/Snowfall';
-
 const Main = loadable(() => import('@pages/Main'));
 const Create = loadable(() => import('@pages/CreateRoom'));
 const Join = loadable(() => import('@pages/JoinRoom'));
@@ -15,7 +13,6 @@ const Full = loadable(() => import('@pages/FullRoom'));
 const App = () => {
   return (
     <>
-      <Snowfall />
       <Routes>
         <Route path="/" element={<Main />} />
         <Route path="game" element={<Room />}>

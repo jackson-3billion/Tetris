@@ -45,7 +45,7 @@ export default JoinRoom;
 
 const Wrapper = styled.div`
   height: 100vh;
-  background-color: #e9eaed;
+  //background-color: #e9eaed;
   display: flex;
   justify-content: center;
   align-items: center;
