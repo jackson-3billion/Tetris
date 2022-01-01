@@ -45,7 +45,7 @@ export default memo(Opponent);
 const TetrisWrapper = styled.div`
   width: 100vw;
   height: 100vh;
-  background: gray;
+  //background: gray;
   overflow: hidden;
 `;
 
