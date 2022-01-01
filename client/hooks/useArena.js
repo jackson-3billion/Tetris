@@ -49,7 +49,10 @@ const useArena = (player, resetPlayer, setPlaying) => {
         uniqueItems = [...uniqueItems.splice(flipItemIdx, 1), ...uniqueItems];
       }
 
-      uniqueItems.length && setTimeout(() => actions.setItems([...uniqueItems]), 0);
+      if (uniqueItems.length) {
+        setTimeout(() => actions.setItems([...uniqueItems]), 0);
+      }
+
       const newEmptyRows = Array.from(Array(rowsToSweep.length), () => new Array(ARENA_WIDTH).fill(['0', 'A']));
 
       if (player.collided) {
