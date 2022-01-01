@@ -1,8 +1,7 @@
-import { rand } from '@utils/random';
-
 const PIx2 = Math.PI * 2;
 const colors = ['#ffffff', '#e2edf7', '#d8e7f5', '#cfe2f3', '#efefef', '#d6d6d6', '#a6c9e9'];
 const shadowColors = ['#FF8066', '#0081CF', '#00C9A7'];
+const rand = (min, max) => Math.floor(min + Math.random() * (max - min));
 
 class Snowflake {
   constructor(canvas, i) {
