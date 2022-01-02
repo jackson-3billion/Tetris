@@ -8,7 +8,7 @@ const ItemToast = ({ name, isSending }) => {
   return (
     <Wrapper isSending={isSending}>
       <ToastBox isSending={isSending}>
-        <ToastIcon>{iconMapper[name]}</ToastIcon>
+        <ToastIcon>{iconMapper[name === 'bomb' ? 'bombOnFire' : name]}</ToastIcon>
       </ToastBox>
     </Wrapper>
   );

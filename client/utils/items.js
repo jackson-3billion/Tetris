@@ -44,11 +44,12 @@ export const getRandomItem = () => {
 
 export const iconMapper = {
   bomb: <FaBomb color="black" size="80%" />,
+  bombOnFire: <FaBomb color="red" size="80%" />,
   fire: <FaFireAlt color="red" size="80%" />,
   star: <FaStar color="yellow" size="80%" />,
-  faster: <FaForward color="#DC143C" size="80%" />,
+  faster: <FaForward color="#4B4453" size="80%" />,
   slower: <FaBackward color="#008800" size="80%" />,
   catjam: <IoLogoOctocat color="white" size="80%" />,
-  rotate: <GrRotateLeft color="black" size="80%" />,
-  flip: <MdFlip color="black" size="80%" />,
+  rotate: <GrRotateLeft color="white" size="80%" />,
+  flip: <MdFlip color="white" size="80%" />,
 };

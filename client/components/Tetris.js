@@ -31,7 +31,7 @@ const Tetris = ({ gameRoomState, setPlaying, socketRef, sendPortalRef }) => {
 
   // context
   const { state, actions } = useContext(StatusContext);
-  const { level, items, accel, explodingPos, catJamming } = state;
+  const { level, items, accel, score, explodingPos, catJamming } = state;
 
   // local-state
   const [isReady, setIsReady] = useState(false); // guest 입장에서 필요 <-> isOpponentReady: host가 필요
@@ -131,6 +131,20 @@ const Tetris = ({ gameRoomState, setPlaying, socketRef, sendPortalRef }) => {
       socket.emit('arena-updated', arena);
     }
   }, [arena, socketRef]);
+
+  useEffect(() => {
+    if (socketRef?.current) {
+      const socket = socketRef.current;
+      socket.emit('score-updated', score);
+    }
+  }, [score, socketRef]);
+
+  useEffect(() => {
+    if (socketRef?.current) {
+      const socket = socketRef.current;
+      socket.emit('level-updated', level);
+    }
+  }, [level, socketRef]);
 
   // guest의 준비 상태를 host에게 전송
   useEffect(() => {
@@ -284,11 +298,15 @@ const Tetris = ({ gameRoomState, setPlaying, socketRef, sendPortalRef }) => {
       <TetrisGame>
         <Arena arena={arena} {...state} />
         <aside>
-          <Preview tetromino={player.next.preview} />
-          <Display text={level} />
-          <Display text={dropInterval} />
-          <Display text={accel} />
-          <Display text={playing ? 'playing' : 'game over'} />
+          <Display title="next">
+            <Preview tetromino={player.next.preview} />
+          </Display>
+          <Display title="Level">{level}</Display>
+          <Display title="Interval" text={dropInterval}>
+            {dropInterval}
+          </Display>
+          <Display title="Accel">{accel}</Display>
+          <Display title="Score">{score}</Display>
           <Button callback={handleButtonClick} text={getButtonText()} color={getButtonColor()} />
           {playing && (
             <Button callback={handlePause} text={paused ? 'resume' : 'pause'} color={paused ? 'salmon' : 'blue'} />

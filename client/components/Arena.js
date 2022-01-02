@@ -43,16 +43,10 @@ const Wrapper = styled.div`
 `;
 
 const StyledArena = styled.div`
+  width: 25vw;
   display: grid;
-  grid-template-rows: repeat(
-    ${({ height }) => height},
-    calc((25vw - (${({ width }) => width - 1 + 'px'})) / ${({ width }) => width})
-  );
+  grid-template-rows: repeat(${({ height }) => height}, calc((25vw) / ${({ width }) => width}));
   grid-template-columns: repeat(${({ width }) => width}, 1fr);
-  grid-gap: 1px;
-  width: 100%;
-  max-width: 25vw;
-  //background: #111;
   transition: transform 500ms ease-in-out;
 
   ${({ rotated }) =>

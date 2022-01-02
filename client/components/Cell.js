@@ -1,14 +1,14 @@
 import React, { memo } from 'react';
 import styled from '@emotion/styled';
 import { keyframes, css } from '@emotion/react';
-import { lighten, darken } from 'polished';
+import { lighten } from 'polished';
 
 import { TETROMINOS } from '@utils/tetrominos';
 import { iconMapper } from '@utils/items';
 
 export const Cell = ({ type, item, sparkling, exploding }) => {
   return (
-    <CellBorder color={TETROMINOS[type].color}>
+    <CellBorder type={type} color={TETROMINOS[type].color}>
       <StyledCell type={type} color={TETROMINOS[type].color} sparkling={sparkling} exploding={exploding}>
         {item && iconMapper[item.name]}
       </StyledCell>
@@ -34,14 +34,15 @@ const explode = keyframes`
 `;
 
 const CellBorder = styled.div`
-  border: ${({ type }) => (type === '0' ? '0px solid' : '1px solid')};
-  border-color: ${({ color }) => darken(0.2, 'gray')};
+  border: 1px solid #303030;
+  margin-left: -1px;
+  margin-top: -1px;
 `;
 
 const StyledCell = styled.div`
   height: 100%;
   background-color: ${({ color }) => color};
-  border: ${({ type }) => (type === '0' ? 'none' : '1px solid')};
+  border: ${({ type }) => (type === '0' ? 'none' : '2px solid')};
   border-color: ${({ color }) => lighten(0.3, color)};
 
   display: flex;

@@ -40,6 +40,7 @@ const Options = styled.div`
   width: 15%;
   display: flex;
   justify-content: space-between;
+  z-index: 1;
   & > * {
     font-size: 1.2rem;
     cursor: pointer;

@@ -53,6 +53,14 @@ io.on('connection', socket => {
       socket.broadcast.to(gameRoomId).emit('arena-updated', arena);
     });
 
+    socket.on('score-updated', score => {
+      socket.broadcast.to(gameRoomId).emit('score-updated', score);
+    });
+
+    socket.on('level-updated', level => {
+      socket.broadcast.to(gameRoomId).emit('level-updated', level);
+    });
+
     socket.on('isReady', isReady => {
       socket.broadcast.to(gameRoomId).emit('isReady', isReady);
     });
