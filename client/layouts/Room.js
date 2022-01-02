@@ -1,20 +1,22 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Outlet } from 'react-router-dom';
 import styled from '@emotion/styled';
 
-import Home from '@components/Home';
+import useSnowfallToggle from '@hooks/useSnowfallToggle';
+import useBgmToggle from '@hooks/useBgmToggle';
+
 import Snowfall from '@components/Snowfall';
+import Home from '@components/Home';
 
 const Room = () => {
-  const [showSnowfall, setShowSnowfall] = useState(true);
-
-  const handleSnowfallToggle = () => setShowSnowfall((show) => !show);
+  const [showSnowfall, setShowSnowfall, SnowfallToggler] = useSnowfallToggle();
+  const [playing, setPlaying, BgmToggler] = useBgmToggle();
 
   return (
     <Wrapper>
       <Options>
-        <SnowfallToggler id="snowfall" type="checkbox" checked={showSnowfall} onChange={handleSnowfallToggle} />
-        <SnowfallTogglerLabel htmlFor="snowfall">Animation {showSnowfall ? 'ON' : 'OFF'}</SnowfallTogglerLabel>
+        <SnowfallToggler />
+        <BgmToggler />
       </Options>
       {showSnowfall && <Snowfall />}
       <Outlet />
@@ -37,21 +39,11 @@ const Options = styled.div`
   position: fixed;
   top: 0;
   right: 0;
-  width: 15%;
   display: flex;
-  justify-content: space-between;
+  width: 20%;
+  min-width: 300px;
   z-index: 1;
-  & > * {
+  & > div {
     font-size: 1.2rem;
-    cursor: pointer;
   }
-`;
-
-const SnowfallToggler = styled.input`
-  display: none;
-`;
-
-const SnowfallTogglerLabel = styled.label`
-  color: white;
-  min-width: 50%;
 `;
