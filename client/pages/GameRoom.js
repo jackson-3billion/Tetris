@@ -140,6 +140,11 @@ const GameRoom = () => {
               <Opponent socketRef={socketRef} opponentNickname={opponentNickname} />
             </>
           )}
+          {!opponentNickname && (
+            <>
+              <div>empty</div>
+            </>
+          )}
         </Wrapper>
       )}
       {isGameOverModalOpen && <GameOverModal>GAME OVER</GameOverModal>}
