@@ -26,15 +26,15 @@ const CatJam = ({ catJamBgmRef, isOpponent }) => {
 export default CatJam;
 
 const slideLeftToRight = keyframes`
-    0% { transform: translateX(calc(-100%)); }
-   40% { transform: translateX(calc(-20%)); }
-  100% { transform: translateX(calc(-100%)); }
+    0% { transform: translate3d(calc(-100%), 0, 0); }
+   40% { transform: translate3d(calc(-20%), 0, 0); }
+  100% { transform: translate3d(calc(-100%), 0, 0); }
 `;
 
 const slideRightToLeft = keyframes`
-    0% { transform: translateX(calc(80%)) rotateY(180deg); }
-   40% { transform: translateX(calc(20%)) rotateY(180deg); }
-  100% { transform: translateX(calc(100%)) rotateY(180deg); }
+    0% { transform: translate3d(calc(80%), 0, 0) rotateY(180deg); }
+   40% { transform: translate3d(calc(20%), 0, 0) rotateY(180deg); }
+  100% { transform: translate3d(calc(100%), 0, 0) rotateY(180deg); }
 `;
 
 const Wrapper = styled.div`
