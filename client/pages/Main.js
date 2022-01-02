@@ -1,7 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import styled from '@emotion/styled';
-import { darken } from 'polished';
 
 import { rankList } from '@utils/dummy';
 
@@ -14,8 +13,9 @@ const Main = () => {
     <Wrapper>
       <Logo />
       <RankList>
+        <Title>Best Players</Title>
         {rankList.map(({ score, nickname }, idx) => (
-          <RankItem key={idx}>
+          <RankItem key={idx} idx={idx}>
             <Rank>
               <span>{idx + 1}</span>
               <span>{ordinalMapper[idx]}</span>
@@ -43,7 +43,7 @@ const Wrapper = styled.div`
   height: 100vh;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: space-evenly;
   align-items: center;
   background-color: black;
   color: #f6f7fb;
@@ -54,11 +54,17 @@ const RankList = styled.div`
   min-width: 300px;
 `;
 
+const Title = styled.div`
+  font-size: 2.2rem;
+  text-align: center;
+`;
+
 const RankItem = styled.div`
   display: flex;
   justify-content: space-evenly;
   font-size: 2rem;
   text-align: right;
+  color: ${({ idx }) => (idx === 0 ? 'gold' : 'white')};
 `;
 
 const Rank = styled.span`
@@ -78,7 +84,6 @@ const Nickname = styled.span`
 `;
 
 const Buttons = styled.div`
-  margin-top: 2rem;
   display: flex;
   justify-content: space-between;
   min-width: 350px;
@@ -94,13 +99,14 @@ const LinkButton = styled(Link)`
   text-decoration: none;
   color: white;
   border-radius: 5px;
-  padding: 0.3rem;
+  border: 2px solid gray;
+  padding: 4px;
   font-size: 1.5rem;
   font-weight: bold;
-  background-color: ${({ color }) => color};
 
   &:hover {
-    background-color: ${({ color }) => darken(0.1, color)};
+    background-color: ${({ color }) => color};
+    border-color: ${({ color }) => color};
   }
 
   @media all and (max-width: 600px) {
