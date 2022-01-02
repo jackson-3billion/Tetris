@@ -15,11 +15,6 @@ export default memo(Preview);
 
 const PreviewArena = styled.div`
   display: grid;
-  grid-template-rows: repeat(
-    ${({ height }) => height},
-    calc((110px - (${({ width }) => width * 2 - 1 + 'px'})) / ${({ width }) => width})
-  );
+  grid-template-rows: repeat(${({ height }) => height}, calc((100px) / ${({ width }) => width}));
   grid-template-columns: repeat(${({ width }) => width}, 1fr);
-  grid-gap: 1px;
-  width: 100%;
 `;
