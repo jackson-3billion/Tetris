@@ -3,7 +3,7 @@ import { useState, useEffect, useContext } from 'react';
 import StatusContext from '@contexts/status';
 
 import { createArena } from '@utils/gameHelper';
-import { ARENA_HEIGHT, ARENA_WIDTH, scoring } from '@utils/constants';
+import { ARENA_HEIGHT, ARENA_WIDTH, SCORING } from '@utils/constants';
 
 const useArena = (player, resetPlayer, setPlaying) => {
   const [arena, setArena] = useState(createArena());
@@ -39,7 +39,7 @@ const useArena = (player, resetPlayer, setPlaying) => {
         rowsToSweep.push(y);
       }
 
-      actions.setScore((prevScore) => prevScore + scoring[rowsToSweep.length]);
+      actions.setScore((prevScore) => prevScore + SCORING[rowsToSweep.length]);
 
       rowsToSweep.forEach((line) => {
         newArena[line].forEach(([, , item]) => item && items.push(item));
