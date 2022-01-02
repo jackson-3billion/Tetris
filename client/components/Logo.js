@@ -16,6 +16,9 @@ export default Logo;
 const Container = styled.div`
   & > div {
     font-family: neonregular;
+    @media all and (max-width: 600px) {
+      font-size: 100px;
+    }
   }
 `;
 
@@ -45,7 +48,7 @@ const flux = keyframes`
 const TitleUp = styled.div`
   font-family: neon;
   color: #fb4264;
-  font-size: 8vw;
+  font-size: calc(48px + 5vw);
   text-shadow: 0 0 3vw #f40a35;
   animation: ${flux} 2s linear infinite;
 `;
@@ -53,7 +56,7 @@ const TitleUp = styled.div`
 const TitleDown = styled.div`
   font-family: neon;
   color: #426dfb;
-  font-size: 8vw;
+  font-size: calc(48px + 5vw);
   text-shadow: 0 0 3vw #2356ff;
   animation: ${neon} 1s ease infinite;
 `;

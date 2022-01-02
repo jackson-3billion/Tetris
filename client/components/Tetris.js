@@ -321,14 +321,16 @@ const Tetris = ({ gameRoomState, setPlaying, socketRef, sendPortalRef }) => {
 export default Tetris;
 
 const TetrisWrapper = styled.div`
+  display: flex;
   position: relative;
-  width: 100vw;
+  width: 50%;
   height: 100vh;
-  //background: gray;
   overflow: hidden;
   &:focus {
     outline: none;
   }
+
+  border: 2px solid green;
 `;
 
 const TetrisGame = styled.div`
@@ -339,8 +341,7 @@ const TetrisGame = styled.div`
   max-width: 900px;
 
   aside {
-    //width: 100%;
-    width: 150px;
+    width: 140px;
     display: block;
     padding: 0 20px;
   }

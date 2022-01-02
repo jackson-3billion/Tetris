@@ -23,7 +23,7 @@ const HomeWrapper = styled.div`
   position: ${({ position }) => position || 'fixed'};
   bottom: ${({ bottom }) => bottom || '0.5rem'};
   right: ${({ right }) => right || '0.7rem'};
-  color: #363636;
+  color: #7c7c7c;
   &:hover {
     cursor: pointer;
     color: ${({ color }) => lighten(0.5, color || '#363636')};
