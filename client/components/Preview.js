@@ -22,8 +22,4 @@ const PreviewArena = styled.div`
   grid-template-columns: repeat(${({ width }) => width}, 1fr);
   grid-gap: 1px;
   width: 100%;
-  //max-width: 10vw;
-  background: #111;
-
-  border: 2px solid purple;
 `;
