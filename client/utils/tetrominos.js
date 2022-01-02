@@ -7,7 +7,7 @@ export const TETROMINOS = {
       ['0', '0', '0', '0'],
       ['0', '0', '0', '0'],
     ],
-    color: '#000000',
+    color: 'transparent',
     itemPos: { y: -1, x: -1 },
   },
   I: {
