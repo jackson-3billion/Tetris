@@ -1,20 +1,20 @@
 import React, { useRef, useEffect } from 'react';
 import styled from '@emotion/styled';
 
+import useResize from '@hooks/useResize';
+
 import Snowflake from '@utils/snowflake';
-import { fixDpi } from '@utils/canvas';
 import { MAX_SNOWFLAKES } from '@utils/constants';
 
 const Snowfall = () => {
   const canvasRef = useRef();
+  useResize(canvasRef);
 
   useEffect(() => {
     let requestId;
 
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
-
-    fixDpi(canvas);
 
     const snowflakes = [];
     for (let i = 0; i < MAX_SNOWFLAKES; i++) {

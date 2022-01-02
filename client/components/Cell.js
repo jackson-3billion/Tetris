@@ -35,7 +35,7 @@ const explode = keyframes`
 
 const CellBorder = styled.div`
   border: ${({ type }) => (type === '0' ? '0px solid' : '1px solid')};
-  border-color: ${({ color }) => darken(0.2, color)};
+  border-color: ${({ color }) => darken(0.2, 'gray')};
 `;
 
 const StyledCell = styled.div`

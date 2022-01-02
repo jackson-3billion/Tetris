@@ -52,7 +52,7 @@ const StyledArena = styled.div`
   grid-gap: 1px;
   width: 100%;
   max-width: 25vw;
-  background: #111;
+  //background: #111;
   transition: transform 500ms ease-in-out;
 
   ${({ rotated }) =>

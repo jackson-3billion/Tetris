@@ -10,7 +10,7 @@ class Snowflake {
     this.ctx = canvas.getContext('2d');
 
     this.x = rand(0, canvas.offsetWidth);
-    this.y = rand(0, canvas.offsetHeight);
+    this.y = rand(-canvas.offsetHeight, 0);
     this.r = rand(1, 7);
 
     this.dx = Math.random() > 0.7 ? 0 : rand(1, 4) / 10;
@@ -37,7 +37,6 @@ class Snowflake {
     this.ctx.beginPath();
 
     this.ctx.fillStyle = colors[this.i % colors.length];
-    //this.ctx.filter = 'blur(2px)';
     this.ctx.shadowBlur = 15;
     this.ctx.shadowColor = shadowColors[this.i % shadowColors.length];
 

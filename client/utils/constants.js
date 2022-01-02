@@ -10,3 +10,4 @@ export const RIGHTWARD = { x: 1, y: 0 };
 export const DOWNWARD = { x: 0, y: 1 };
 export const KEYHOLD_MAX_CNT = 2;
 export const MAX_SNOWFLAKES = 100;
+export const SCORING = [0, 100, 300, 600, 1000];
