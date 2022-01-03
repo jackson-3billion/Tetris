@@ -307,9 +307,13 @@ const Tetris = ({ gameRoomState, setPlaying, socketRef, sendPortalRef }) => {
           </Display>
           <Display title="Accel">{accel}</Display>
           <Display title="Score">{score}</Display>
-          <Button callback={handleButtonClick} text={getButtonText()} color={getButtonColor()} />
+          <Button callback={handleButtonClick} text={getButtonText()} backgroundColor={getButtonColor()} />
           {playing && (
-            <Button callback={handlePause} text={paused ? 'resume' : 'pause'} color={paused ? 'salmon' : 'blue'} />
+            <Button
+              callback={handlePause}
+              text={paused ? 'resume' : 'pause'}
+              backgroundColor={paused ? 'salmon' : 'blue'}
+            />
           )}
         </aside>
       </TetrisGame>
