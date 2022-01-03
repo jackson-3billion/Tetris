@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from '@emotion/styled';
 import { v4 as uuid } from 'uuid';
-import { useNavigate } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 
 import useInput from '@hooks/useInput';
 import useValidate from '@hooks/useValidate';

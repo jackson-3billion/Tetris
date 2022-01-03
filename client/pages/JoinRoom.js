@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from '@emotion/styled';
-import { useNavigate } from 'react-router';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import useInput from '@hooks/useInput';
 import useValidate from '@hooks/useValidate';
@@ -9,8 +9,9 @@ import { nicknameValidator } from '@utils/validate';
 
 const JoinRoom = () => {
   const navigate = useNavigate();
+  const { id } = useParams();
   const [nickname, handleNicknameChange] = useInput('');
-  const [gameRoomId, handleGameRoomIdChange] = useInput('');
+  const [gameRoomId, handleGameRoomIdChange] = useInput(id || '');
   const [isValidNickname, msg] = useValidate(nickname, nicknameValidator);
 
   const handleJoinRoom = (e) => {

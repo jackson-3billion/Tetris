@@ -1,6 +1,6 @@
 import React, { useCallback, memo } from 'react';
 import styled from '@emotion/styled';
-import { useNavigate } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 
 import { IoIosHome } from 'react-icons/io';
 import { lighten } from 'polished';
