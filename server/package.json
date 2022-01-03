@@ -19,6 +19,7 @@
     "eslint-plugin-prettier": "^3.4.1",
     "express": "^4.17.1",
     "mysql2": "^2.3.3",
+    "nodemailer": "^6.7.2",
     "socket.io": "^4.4.0"
   },
   "devDependencies": {
