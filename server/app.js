@@ -1,18 +1,25 @@
-const app = require('express')();
-//const cors = require('cors');
+const express = require('express');
+const app = express();
+const cors = require('cors');
 const http = require('http');
 const server = http.createServer(app);
 const { Server } = require('socket.io');
+
+const mailRouter = require('./routes/mail');
 
 if (process.env.NODE_ENV === 'development') {
   require('dotenv').config({ path: './.env.dev' });
 }
 
-//app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(cors({ origin: process.env.CLIENT_URL }));
 
 app.get('/', (req, res) => {
   res.send('Hello World!');
 });
+
+app.use('/email', mailRouter);
 
 // const db = require('./db');
 // db.query('select * from player', (_, rows) => {
