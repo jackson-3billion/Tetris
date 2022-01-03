@@ -18,6 +18,7 @@ const App = () => {
         <Route path="game" element={<Room />}>
           <Route path="create" element={<Create />} />
           <Route path="join" element={<Join />} />
+          <Route path="join/:id" element={<Join />} />
           <Route path=":id" element={<Game />} />
           <Route path="full" element={<Full />} />
         </Route>
