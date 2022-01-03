@@ -2,11 +2,17 @@ import React from 'react';
 import { createPortal } from 'react-dom';
 import styled from '@emotion/styled';
 
-const Modal = ({ children }) => {
+const Modal = ({ children, closableOverlay, hideModal, styles }) => {
+  const handleOverlayClick = () => {
+    if (closableOverlay) {
+      hideModal();
+    }
+  };
+
   return createPortal(
     <>
-      <Overlay />
-      <ModalContainer>{children}</ModalContainer>
+      <Overlay onClick={handleOverlayClick} backgroundColor={styles?.overlayColor} />
+      <ModalContainer {...styles}>{children}</ModalContainer>
     </>,
     document.getElementById('modal'),
   );
@@ -20,7 +26,7 @@ const Overlay = styled.div`
   right: 0;
   top: 0;
   bottom: 0;
-  background-color: ${({ color }) => (color ? color : 'black')};
+  background-color: ${({ backgroundColor }) => (backgroundColor ? backgroundColor : 'black')};
   opacity: ${({ opacity }) => (opacity ? opacity : 0.2)};
   z-index: 2;
 `;
@@ -31,12 +37,19 @@ const ModalContainer = styled.div`
   right: 0;
   top: 0;
   bottom: 0;
-  width: 60%;
-  height: 80%;
+  width: ${({ width }) => (width ? width : '60%')};
+  min-width: ${({ minWidth }) => (minWidth ? minWidth : 'none')};
+  min-height: ${({ minHeight }) => (minHeight ? minHeight : 'none')};
+  height: ${({ height }) => (height ? height : '80%')};
   margin: auto;
-  padding: 3rem;
+  padding: ${({ padding }) => (padding ? padding : '3rem')};
   border-radius: 5px;
-  background: white;
+  background: ${({ backgroundColor }) => (backgroundColor ? backgroundColor : 'white')};
   z-index: 3;
   box-shadow: 1px 3px 3px 1px rgba(0, 0, 0, 0.2);
+
+  @media all and (max-width: 600px) {
+    width: 95%;
+    min-width: 0;
+  }
 `;
