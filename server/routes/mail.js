@@ -24,7 +24,7 @@ router.post('/', (req, res) => {
     subject: '[Invitation] React-Tetris',
     html: `
       <h2>${inviter}님께서 1:1 테트리스 대결을 신청하셨습니다.🎮</h2>
-      <a href="${process.env.CLIENT_URL}/game/join/${gameRoomId}">테트리스 게임 입장하기</a>
+      <a href=${process.env.CLIENT_URL}/game/join/${gameRoomId}>테트리스 게임 입장하기</a>
     `,
   };
 
