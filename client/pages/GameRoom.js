@@ -12,6 +12,7 @@ import Tetris from '@components/Tetris';
 import ItemSendPortal from '@components/toast/ItemSendPortal';
 import ItemReceivePortal from '@components/toast/ItemReceivePortal';
 import Opponent from '@components/Opponent';
+import Invite from '@components/Invite';
 import Timer from '@components/Timer';
 import Button from '@components/Button';
 
@@ -140,17 +141,15 @@ const GameRoom = () => {
               <Opponent socketRef={socketRef} opponentNickname={opponentNickname} />
             </>
           )}
-          {!opponentNickname && (
-            <>
-              <div>empty</div>
-            </>
-          )}
+          {!opponentNickname && <Invite />}
         </Wrapper>
       )}
       {isGameOverModalOpen && <GameOverModal>GAME OVER</GameOverModal>}
       {isPauseModalOpen && (
         <PauseModal>
-          <Button text="RESUME" callback={handleResume} color="salmon" />
+          <Button callback={handleResume} background-color="crimson">
+            RESUME
+          </Button>
         </PauseModal>
       )}
     </>
