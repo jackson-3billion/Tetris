@@ -8,3 +8,15 @@ export const nicknameValidator = (str) => {
   }
   return [true, '유효한 닉네임입니다.'];
 };
+
+export const emailValidator = (str) => {
+  const trimmed = str.trim();
+  const emailRegex = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/;
+  const isValid = emailRegex.exec(trimmed);
+
+  if (isValid) {
+    return [isValid, 'Email is valid'];
+  } else {
+    return [isValid, 'Email is not valid'];
+  }
+};
