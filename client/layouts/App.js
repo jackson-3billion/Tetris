@@ -1,20 +1,14 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
-//import loadable from '@loadable/component';
+import loadable from '@loadable/component';
 
 import Room from '@layouts/Room';
 
-import Main from '@pages/Main';
-import Create from '@pages/CreateRoom';
-import Join from '@pages/JoinRoom';
-import Game from '@pages/GameRoom';
-import Full from '@pages/FullRoom';
-
-// const Main = loadable(() => import('@pages/Main'));
-// const Create = loadable(() => import('@pages/CreateRoom'));
-// const Join = loadable(() => import('@pages/JoinRoom'));
-// const Game = loadable(() => import('@pages/GameRoom'));
-// const Full = loadable(() => import('@pages/FullRoom'));
+const Main = loadable(() => import('@pages/Main'));
+const Create = loadable(() => import('@pages/CreateRoom'));
+const Join = loadable(() => import('@pages/JoinRoom'));
+const Game = loadable(() => import('@pages/GameRoom'));
+const Full = loadable(() => import('@pages/FullRoom'));
 
 const App = () => {
   return (
