@@ -1,6 +1,7 @@
 import React from 'react';
 import { render } from 'react-dom';
 import { BrowserRouter } from 'react-router-dom';
+import axios from 'axios';
 import { Global, css } from '@emotion/react';
 import neonregular2 from './fonts/neon-webfont.woff2';
 import neonregular from './fonts/neon-webfont.woff';
@@ -9,6 +10,8 @@ import { StatusProvider } from '@contexts/status';
 import { OpponentStatusProvider } from '@contexts/opponentStatus';
 
 import App from '@layouts/App';
+
+axios.defaults.baseURL = process.env.SERVER_URL;
 
 const styles = css`
   @font-face {
