@@ -28,7 +28,8 @@ const Room = () => {
 export default Room;
 
 const Wrapper = styled.div`
-  background-color: black;
+  //background-color: black;
+  background-color: #292929;
   z-index: -1;
   position: absolute;
   width: 100%;

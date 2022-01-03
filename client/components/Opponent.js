@@ -56,7 +56,7 @@ const Opponent = ({ socketRef, catJamBgmRef, opponentNickname }) => {
 export default memo(Opponent);
 
 const TetrisWrapper = styled.div`
-  width: 100vw;
+  width: 50%;
   height: 100vh;
   overflow: hidden;
 `;

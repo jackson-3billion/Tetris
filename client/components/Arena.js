@@ -49,6 +49,8 @@ const StyledArena = styled.div`
   grid-template-columns: repeat(${({ width }) => width}, 1fr);
   transition: transform 500ms ease-in-out;
   border: 3px solid #7c7c7c;
+  border-right-width: 2px;
+  border-bottom-width: 2px;
 
   ${({ rotated }) =>
     rotated &&

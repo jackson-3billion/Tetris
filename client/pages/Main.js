@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import styled from '@emotion/styled';
+import { lighten, darken } from 'polished';
 
 import { rankList } from '@utils/dummy';
 
@@ -105,8 +106,8 @@ const LinkButton = styled(Link)`
   font-weight: bold;
 
   &:hover {
-    background-color: ${({ color }) => color};
-    border-color: ${({ color }) => color};
+    background-color: ${lighten(0.4, 'black')};
+    border-color: ${lighten(0.4, 'black')};
   }
 
   @media all and (max-width: 600px) {
