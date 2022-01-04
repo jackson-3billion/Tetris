@@ -1,7 +1,8 @@
 const colorMapper = {
-  buttonDefault: '#333',
-  buttonReady: 'green',
-  buttonStart: 'red',
+  default: 'dimgray',
+  isNotReady: '#0f8a5f',
+  isReady: '#0083D4',
+  startable: '#D6524E',
 };
 
 export default colorMapper;

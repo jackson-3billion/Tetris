@@ -5,16 +5,17 @@ import OpponentStatusContext from '@contexts/opponentStatus';
 
 import Arena from '@components/Arena';
 import Display from '@components/Display';
+import Preview from '@components/Preview';
 import CatJam from '@components/CatJam';
 
 import useMounted from '@hooks/useMounted';
 
 import { createArena } from '@utils/gameHelper';
 
-const Opponent = ({ socketRef, catJamBgmRef, opponentNickname }) => {
+const Opponent = ({ socketRef, catJamBgmRef, opponentNickname, isReady }) => {
   const {
     state,
-    actions: { setScore, setLevel },
+    actions: { setScore, setLevel, setPreview },
   } = useContext(OpponentStatusContext);
 
   const [arena, setArena] = useState(createArena());
@@ -30,23 +31,27 @@ const Opponent = ({ socketRef, catJamBgmRef, opponentNickname }) => {
     });
     socket.on('score-updated', (score) => setScore(score));
     socket.on('level-updated', (level) => setLevel(level));
+    socket.on('preview-updated', (preview) => setPreview(preview));
 
     return () => {
       socket.off('arena-updated');
       socket.off('score-updated');
       socket.off('level-updated');
     };
-  }, [socketRef, mounted, setScore, setLevel]);
+  }, [socketRef, mounted, setScore, setLevel, setPreview]);
 
   return (
     <TetrisWrapper>
       <TetrisGame>
-        <Arena arena={arena} {...state} />
         <aside>
+          <Display title="next">
+            <Preview tetromino={state.preview} />
+          </Display>
           <Display title="Nickname">{opponentNickname ? opponentNickname : 'waiting'}</Display>
           <Display title="Level">{state.level}</Display>
           <Display title="Score">{state.score}</Display>
         </aside>
+        <Arena isReady={isReady} arena={arena} {...state} />
       </TetrisGame>
       {state.catJamming && <CatJam catJamBgmRef={catJamBgmRef} isOpponent={true} />}
     </TetrisWrapper>
@@ -56,8 +61,10 @@ const Opponent = ({ socketRef, catJamBgmRef, opponentNickname }) => {
 export default memo(Opponent);
 
 const TetrisWrapper = styled.div`
+  display: flex;
+  justify-content: center;
   width: 50%;
-  height: 100vh;
+  height: 100%;
   overflow: hidden;
 `;
 
@@ -69,7 +76,7 @@ const TetrisGame = styled.div`
   max-width: 900px;
 
   aside {
-    max-width: 200px;
+    width: 140px;
     display: block;
     padding: 0 20px;
   }

@@ -14,7 +14,7 @@ const Invite = () => {
     height: '50%',
     minWidth: '650px',
     minHeight: '400px',
-    backgroundColor: '#121212',
+    backgroundColor: '#737373',
     overlayColor: 'none',
   };
   const [isModalOpen, openModal, hideModal, ModalContainer] = useModal({ closableOverlay: true, styles: modalStyles });
@@ -43,7 +43,6 @@ const Invite = () => {
 export default Invite;
 
 const Wrapper = styled.div`
-  border: 2px solid salmon;
   width: 50%;
   color: white;
   display: flex;
@@ -56,29 +55,9 @@ const Msg = styled.div`
   font-size: 3vw;
   width: 100%;
   text-align: center;
+  padding-left: 5rem;
   height: fit-content;
-
-  /* @media all and(min-width: 801px) and (max-width: 1000px) {
-    font-size: 2rem;
-    background-color: red;
-  }
-
-  @media all and (min-width: 601px) and (max-width: 800px) {
-    font-size: 1.5rem;
-    background-color: blue;
-  }
-
-  @media all and (max-width: 600px) {
-    font-size: 1.2rem;
-    background-color: yellow;
-  } */
 `;
-
-// const EmptyDots = styled.span`
-//   color: transparent;
-// `;
-
-// const LoadingIndicator = styled.span``;
 
 const InviteButton = styled(Button)``;
 
@@ -97,5 +76,7 @@ const Buttons = styled.div`
     padding: 0.5rem;
     font-size: 1.8vw;
     border-radius: 30px;
+    border: 2px solid white;
+    font-weight: bold;
   }
 `;

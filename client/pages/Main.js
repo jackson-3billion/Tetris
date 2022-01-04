@@ -1,7 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import styled from '@emotion/styled';
-import { lighten, darken } from 'polished';
 
 import { rankList } from '@utils/dummy';
 
@@ -27,10 +26,10 @@ const Main = () => {
         ))}
       </RankList>
       <Buttons>
-        <LinkButton to="/game/create" color="#FF9671">
+        <LinkButton to="/game/create" hoverColor="#0f8a5f">
           Create
         </LinkButton>
-        <LinkButton to="/game/join" color="#00C9A7">
+        <LinkButton to="/game/join" hoverColor="#0083D4">
           Join
         </LinkButton>
       </Buttons>
@@ -42,6 +41,7 @@ export default Main;
 
 const Wrapper = styled.div`
   height: 100vh;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;
@@ -106,8 +106,8 @@ const LinkButton = styled(Link)`
   font-weight: bold;
 
   &:hover {
-    background-color: ${lighten(0.4, 'black')};
-    border-color: ${lighten(0.4, 'black')};
+    background-color: ${({ hoverColor }) => hoverColor};
+    border-color: ${({ hoverColor }) => hoverColor};
   }
 
   @media all and (max-width: 600px) {

@@ -37,12 +37,12 @@ const ModalContainer = styled.div`
   right: 0;
   top: 0;
   bottom: 0;
-  width: ${({ width }) => (width ? width : '60%')};
-  min-width: ${({ minWidth }) => (minWidth ? minWidth : 'none')};
-  min-height: ${({ minHeight }) => (minHeight ? minHeight : 'none')};
-  height: ${({ height }) => (height ? height : '80%')};
+  width: ${({ width }) => (width ? width : '40%')};
+  min-width: ${({ minWidth }) => (minWidth ? minWidth : '650px')};
+  min-height: ${({ minHeight }) => (minHeight ? minHeight : '400px')};
+  height: ${({ height }) => (height ? height : '50%')};
   margin: auto;
-  padding: ${({ padding }) => (padding ? padding : '3rem')};
+  padding: ${({ padding }) => (padding ? padding : 0)};
   border-radius: 5px;
   background: ${({ backgroundColor }) => (backgroundColor ? backgroundColor : 'white')};
   z-index: 3;

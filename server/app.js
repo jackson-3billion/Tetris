@@ -56,16 +56,28 @@ io.on('connection', socket => {
       socket.broadcast.to(gameRoomId).emit('nickname', nickname);
     });
 
-    socket.on('arena-updated', arena => {
-      socket.broadcast.to(gameRoomId).emit('arena-updated', arena);
-    });
+    const updatedEvents = ['arena-updated', 'score-updated', 'level-updated', 'preview-updated'];
 
-    socket.on('score-updated', score => {
-      socket.broadcast.to(gameRoomId).emit('score-updated', score);
-    });
+    // socket.on('arena-updated', arena => {
+    //   socket.broadcast.to(gameRoomId).emit('arena-updated', arena);
+    // });
 
-    socket.on('level-updated', level => {
-      socket.broadcast.to(gameRoomId).emit('level-updated', level);
+    // socket.on('score-updated', score => {
+    //   socket.broadcast.to(gameRoomId).emit('score-updated', score);
+    // });
+
+    // socket.on('level-updated', level => {
+    //   socket.broadcast.to(gameRoomId).emit('level-updated', level);
+    // });
+
+    // socket.on('preview-updated', preview => {
+    //   socket.broadcast.to(gameRoomId).emit('preview-updated', preview);
+    // });
+
+    updatedEvents.forEach(event => {
+      socket.on(event, data => {
+        socket.broadcast.to(gameRoomId).emit(event, data);
+      });
     });
 
     socket.on('isReady', isReady => {
@@ -76,7 +88,7 @@ io.on('connection', socket => {
 
     socket.on('item', item => io.to(gameRoomId).emit('item', { sender: socket.id, ...item }));
 
-    socket.on('paused', () => io.to(gameRoomId).emit('paused', true));
+    socket.on('paused', () => io.to(gameRoomId).emit('paused', socket.id));
 
     socket.on('resume', () => io.to(gameRoomId).emit('paused', false));
 

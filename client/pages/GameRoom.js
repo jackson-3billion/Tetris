@@ -8,21 +8,19 @@ import OpponentStatusContext from '@contexts/opponentStatus';
 import useSocket from '@hooks/useSocket';
 import useModal from '@hooks/useModal';
 
+import LoadingIndicator from '@components/LoadingIndicator';
 import Tetris from '@components/Tetris';
 import ItemSendPortal from '@components/toast/ItemSendPortal';
 import ItemReceivePortal from '@components/toast/ItemReceivePortal';
 import Opponent from '@components/Opponent';
 import Invite from '@components/Invite';
 import Timer from '@components/Timer';
-import Button from '@components/Button';
+import PauseModalContent from '@components/PauseModalContent';
 
 import { ARENA_HEIGHT, ARENA_WIDTH } from '@utils/constants';
 
 const GameRoom = () => {
-  const {
-    // actions: { setAccel, setExplodingPos, setCatJamming, setRotated, setFlipped },
-    actions,
-  } = useContext(StatusContext);
+  const { actions } = useContext(StatusContext);
   const { actions: oppActions } = useContext(OpponentStatusContext);
 
   const actionsRef = useRef(actions);
@@ -36,11 +34,12 @@ const GameRoom = () => {
   const sendPortalRef = useRef();
   const receivePortalRef = useRef();
 
-  const [isGameOverModalOpen, openGameOverModal, hideGameOverModal, GameOverModal] = useModal();
-  const [isPauseModalOpen, openPauseModal, hidePauseModal, PauseModal] = useModal();
+  const modalStyles = { backgroundColor: '#737373', overlayColor: 'black' };
+  const [isGameOverModalOpen, openGameOverModal, hideGameOverModal, GameOverModal] = useModal({ styles: modalStyles });
+  const [isPauseModalOpen, openPauseModal, hidePauseModal, PauseModal] = useModal({ styles: modalStyles });
 
   const [gameRoomState, dispatch] = useReducer(reducer, initialState);
-  const { joined, playing, paused, isGameOver, opponentNickname } = gameRoomState;
+  const { joined, playing, paused, isGameOver, opponentNickname, isPauser } = gameRoomState;
 
   const handleStateChange = useCallback((k) => (v) => dispatch({ payload: { [k]: v } }), []);
   const handleResume = () => socketRef?.current?.emit('resume');
@@ -55,6 +54,13 @@ const GameRoom = () => {
   }, []);
 
   useEffect(() => {
+    if (!nickname) {
+      alert('닉네임을 먼저 정해주세요😉');
+      navigate('/');
+    }
+  }, [nickname, navigate]);
+
+  useEffect(() => {
     if (!socketRef?.current) return;
     const socket = socketRef.current;
     socket.emit('join', gameRoomId);
@@ -65,7 +71,7 @@ const GameRoom = () => {
     socket.on('nickname', (opponentNickname) => dispatch({ payload: { opponentNickname } }));
     socket.on('isReady', (isReady) => dispatch({ payload: { isReady } }));
     socket.on('start', () => dispatch({ payload: { playing: true, isGameOver: false, isWinner: false } }));
-    socket.on('paused', (paused) => dispatch({ payload: { paused } }));
+    socket.on('paused', (paused) => dispatch({ payload: { paused: !!paused, isPauser: paused === socket.id } }));
     socket.on('gameOver', (winner) => dispatch({ payload: { isGameOver: true, isWinner: nickname === winner } }));
     socket.on('opponentLeft', () => dispatch({ payload: { playing: false, isHost: true, opponentNickname: '' } }));
 
@@ -123,33 +129,41 @@ const GameRoom = () => {
 
   return (
     <>
-      {!joined && <div>loading</div>}
+      {!joined && <LoadingIndicator />}
       {joined && (
         <Wrapper>
           <Timer playing={playing} paused={paused} />
-          <Tetris
-            gameRoomState={gameRoomState}
-            setPlaying={handleStateChange('playing')}
-            socketRef={socketRef}
-            sendPortalRef={sendPortalRef}
-          />
+          <InnerWrapper>
+            <Tetris
+              gameRoomState={gameRoomState}
+              setPlaying={handleStateChange('playing')}
+              socketRef={socketRef}
+              sendPortalRef={sendPortalRef}
+            />
 
-          {!!opponentNickname && (
-            <>
-              <ItemSendPortal ref={sendPortalRef} />
-              <ItemReceivePortal ref={receivePortalRef} />
-              <Opponent socketRef={socketRef} opponentNickname={opponentNickname} />
-            </>
-          )}
-          {!opponentNickname && <Invite />}
+            {!!opponentNickname && (
+              <>
+                <ItemSendPortal ref={sendPortalRef} />
+                <ItemReceivePortal ref={receivePortalRef} />
+                <Opponent
+                  isReady={gameRoomState.isReady || playing}
+                  socketRef={socketRef}
+                  opponentNickname={opponentNickname}
+                />
+              </>
+            )}
+            {!opponentNickname && <Invite />}
+          </InnerWrapper>
         </Wrapper>
       )}
       {isGameOverModalOpen && <GameOverModal>GAME OVER</GameOverModal>}
       {isPauseModalOpen && (
         <PauseModal>
-          <Button callback={handleResume} background-color="crimson">
-            RESUME
-          </Button>
+          <PauseModalContent
+            hideModal={hidePauseModal}
+            callback={handleResume}
+            pauser={isPauser ? nickname : opponentNickname}
+          />
         </PauseModal>
       )}
     </>
@@ -162,6 +176,7 @@ const initialState = {
   joined: false,
   playing: false,
   paused: false,
+  isPauser: false,
   isHost: false,
   isReady: false,
   isGameOver: false,
@@ -172,5 +187,13 @@ const initialState = {
 const reducer = (state, action) => ({ ...state, ...action.payload });
 
 const Wrapper = styled.div`
+  //display: flex;
+  //flex-direction: column;
+  //overflow: hidden;
+  height: 100%;
+`;
+
+const InnerWrapper = styled.div`
+  height: 92%;
   display: flex;
 `;

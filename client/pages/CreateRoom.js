@@ -60,9 +60,11 @@ const Form = styled.form`
     border: none;
     border-radius: 5px;
     font-size: 1.2rem;
-    background-color: #d2aa87;
-    box-shadow: 10px 10px 14px 1px rgb(0 0 0 / 20%);
+    background-color: #0f8a5f;
+    box-shadow: 10px 10px 14px 1px rgb(0 0 0 / 70%);
     transition: all 0.3s ease-in;
+    font-weight: bold;
+    color: white;
 
     &:hover:disabled {
       cursor: not-allowed;

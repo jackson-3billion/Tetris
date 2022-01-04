@@ -1,5 +1,7 @@
 import React, { createContext, useState } from 'react';
 
+import { TETROMINOS } from '@utils/tetrominos';
+
 const OpponentStatusContext = createContext({
   state: {
     level: 0,
@@ -8,6 +10,7 @@ const OpponentStatusContext = createContext({
     catJamming: false,
     rotated: false,
     flipped: false,
+    preview: null,
   },
   actions: {
     setLevel: () => {},
@@ -16,6 +19,7 @@ const OpponentStatusContext = createContext({
     setCatJamming: () => {},
     setRotated: () => {},
     setFlipped: () => {},
+    setPreview: () => {},
   },
 });
 
@@ -26,9 +30,10 @@ const OpponentStatusProvider = ({ children }) => {
   const [catJamming, setCatJamming] = useState(false);
   const [rotated, setRotated] = useState(false);
   const [flipped, setFlipped] = useState(false);
+  const [preview, setPreview] = useState(TETROMINOS[0].preview);
   const value = {
-    state: { level, score, explodingPos, catJamming, rotated, flipped },
-    actions: { setLevel, setScore, setExplodingPos, setCatJamming, setRotated, setFlipped },
+    state: { level, score, explodingPos, catJamming, rotated, flipped, preview },
+    actions: { setLevel, setScore, setExplodingPos, setCatJamming, setRotated, setFlipped, setPreview },
   };
 
   return <OpponentStatusContext.Provider value={value}>{children}</OpponentStatusContext.Provider>;
