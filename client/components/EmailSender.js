@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import styled from '@emotion/styled';
@@ -14,18 +14,32 @@ import Button from '@components/Button';
 
 import { emailValidator } from '@utils/validate';
 
+const INITIAL_MSG = 'Invite Your Friend to Tetris Game! 🎮';
+
 const EmailSender = ({ hideModal }) => {
   const emailRef = useRef();
   const { id: gameRoomId } = useParams();
   const { state: nickname } = useLocation();
 
+  const [fetching, setFetching] = useState(false);
+  const [msg, setMsg] = useState(INITIAL_MSG);
   const [email, handler] = useInput('');
-  const [isValidEmail, msg] = useValidate(email, emailValidator);
+  const [isValidEmail, validationMsg] = useValidate(email, emailValidator);
 
   useFocus(emailRef);
 
+  useEffect(() => {
+    setMsg(INITIAL_MSG);
+  }, [email]);
+
   const handleSendClick = () => {
-    axios.post('/email', { email, gameRoomId, inviter: nickname }).then((res) => console.log(res));
+    setMsg('Sending invitation... please wait');
+    setFetching(true);
+    axios
+      .post('/email', { email, gameRoomId, inviter: nickname })
+      .then((res) => setMsg(res.data.msg))
+      .catch((err) => setMsg(err.response.data.msg))
+      .finally(() => setFetching(false));
   };
 
   return (
@@ -35,11 +49,16 @@ const EmailSender = ({ hideModal }) => {
         <GoMail size="2rem" />
         <Title>Send Email</Title>
       </Header>
-      <Msg>Invite Your Friend to Tetris Game!🎮</Msg>
+      <Msg>{msg}</Msg>
       <InputWrapper>
         <Email ref={emailRef} onChange={handler} value={email} placeholder="Friend's Email" />
-        {!!email.length && <ValidationMsg isValid={isValidEmail}>{msg}</ValidationMsg>}
-        <SendButton onClick={handleSendClick} disabled={!isValidEmail} backgroundColor="#428bc7">
+        {!!email.length && <ValidationMsg isValid={isValidEmail}>{validationMsg}</ValidationMsg>}
+        <SendButton
+          onClick={handleSendClick}
+          disabled={fetching || !isValidEmail}
+          backgroundColor={fetching ? '#e74c3c' : '#428bc7'}
+          fetching={fetching}
+        >
           <FiSend color="white" />
         </SendButton>
       </InputWrapper>
@@ -65,11 +84,11 @@ const CloseBtn = styled.div`
   top: -1rem;
   right: 0.3rem;
   font-size: 2.5rem;
-  color: #616161;
+  color: #e1e1e1;
   font-weight: bold;
   &:hover {
     cursor: pointer;
-    color: white;
+    color: salmon;
   }
 `;
 
@@ -77,7 +96,8 @@ const Header = styled.div`
   width: 100%;
   height: 4rem;
   padding: 0 2rem;
-  background-color: #1f1f1f;
+  //background-color: #1f1f1f;
+  background-color: #4c4c4c;
   display: flex;
   align-items: center;
   position: absolute;
@@ -93,6 +113,11 @@ const Title = styled.div`
 const Msg = styled.div`
   font-size: 2rem;
   color: white;
+  padding: 0 2rem;
+
+  @media all and (max-width: 600px) {
+    font-size: 1.5rem;
+  }
 `;
 
 const InputWrapper = styled.div`
@@ -141,7 +166,7 @@ const SendButton = styled(Button)`
   border-bottom-right-radius: 7px;
   margin-left: -1px;
   &:hover {
-    background-color: ${lighten(0.1, '#428bc7')};
+    background-color: ${({ fetching }) => (fetching ? lighten(0.1, '#e35259') : lighten(0.1, '#428bc7'))};
   }
 `;
 
