@@ -1,5 +1,8 @@
 import React, { useState, useRef, useEffect, useCallback, useContext } from 'react';
+import { useLocation } from 'react-router-dom';
 import styled from '@emotion/styled';
+import { css } from '@emotion/react';
+import { lighten } from 'polished';
 
 import StatusContext from '@contexts/status';
 
@@ -27,6 +30,7 @@ import {
 } from '@utils/constants';
 
 const Tetris = ({ gameRoomState, setPlaying, socketRef, sendPortalRef }) => {
+  const { state: nickname } = useLocation();
   const { playing, paused, isHost, isReady: isOpponentReady } = gameRoomState;
 
   // context
@@ -162,6 +166,14 @@ const Tetris = ({ gameRoomState, setPlaying, socketRef, sendPortalRef }) => {
   }, [pressedSpacebar, drop]);
 
   useEffect(() => {
+    if (!player?.next || !socketRef?.current) {
+      return;
+    }
+    const socket = socketRef.current;
+    socket.emit('preview-updated', player.next.preview);
+  }, [player.next, socketRef]);
+
+  useEffect(() => {
     const socket = socketRef.current;
     let attackItemCnt = 0;
 
@@ -215,7 +227,7 @@ const Tetris = ({ gameRoomState, setPlaying, socketRef, sendPortalRef }) => {
     setPressedSpacebar(true);
   };
 
-  const handleButtonClick = useCallback(() => {
+  const handleUpperButtonClick = useCallback(() => {
     if (!playing && isHost && isOpponentReady) {
       const socket = socketRef.current;
       socket.emit('start', true);
@@ -225,7 +237,7 @@ const Tetris = ({ gameRoomState, setPlaying, socketRef, sendPortalRef }) => {
     }
   }, [playing, isHost, isOpponentReady, socketRef]);
 
-  const handlePause = useCallback(() => {
+  const handleLowerButtonClick = useCallback(() => {
     const socket = socketRef.current;
     socket.emit('paused', !paused);
   }, [paused, socketRef]);
@@ -275,45 +287,39 @@ const Tetris = ({ gameRoomState, setPlaying, socketRef, sendPortalRef }) => {
     }
   };
 
-  const getButtonText = () => {
-    if (isHost) {
-      return 'start';
-    }
-    if (!isHost) {
-      return isReady ? "I'm ready!" : 'get ready!';
-    }
-  };
-
   const getButtonColor = () => {
     if (isHost) {
-      return isOpponentReady ? colors['buttonStart'] : colors['buttonDefault'];
+      return isOpponentReady ? colors['startable'] : colors['default'];
     }
     if (!isHost) {
-      return isReady ? colors['buttonReady'] : colors['buttonDefault'];
+      return isReady ? colors['isReady'] : colors['isNotReady'];
     }
   };
 
   return (
     <TetrisWrapper ref={focusRef} role="button" tabIndex="0" onKeyDown={handleKeyDown} onKeyUp={handleKeyUp}>
       <TetrisGame>
-        <Arena arena={arena} {...state} />
+        <Arena arena={arena} {...state} isReady={isReady || (isOpponentReady && playing)} />
         <aside>
           <Display title="next">
             <Preview tetromino={player.next.preview} />
           </Display>
+          <Display title="Nickname">{nickname}</Display>
           <Display title="Level">{level}</Display>
-          <Display title="Interval" text={dropInterval}>
-            {dropInterval}
-          </Display>
-          <Display title="Accel">{accel}</Display>
           <Display title="Score">{score}</Display>
-          <Button callback={handleButtonClick} text={getButtonText()} backgroundColor={getButtonColor()} />
+          {!playing && (
+            <UpperButton
+              callback={handleUpperButtonClick}
+              backgroundColor={getButtonColor()}
+              disabled={isHost && !isOpponentReady}
+            >
+              {isHost ? 'start' : isReady ? "I'm Ready!'" : 'Get Ready'}
+            </UpperButton>
+          )}
           {playing && (
-            <Button
-              callback={handlePause}
-              text={paused ? 'resume' : 'pause'}
-              backgroundColor={paused ? 'salmon' : 'blue'}
-            />
+            <LowerButton callback={handleLowerButtonClick} backgroundColor={paused ? 'salmon' : 'blue'}>
+              {paused ? 'resume' : 'pause'}
+            </LowerButton>
           )}
         </aside>
       </TetrisGame>
@@ -326,15 +332,14 @@ export default Tetris;
 
 const TetrisWrapper = styled.div`
   display: flex;
+  justify-content: center;
   position: relative;
   width: 50%;
-  height: 100vh;
+  height: 100%;
   overflow: hidden;
   &:focus {
     outline: none;
   }
-
-  border: 2px solid green;
 `;
 
 const TetrisGame = styled.div`
@@ -348,5 +353,25 @@ const TetrisGame = styled.div`
     width: 140px;
     display: block;
     padding: 0 20px;
+
+    & > Button {
+      border-radius: 5px;
+      padding: 0.5rem 0;
+      &:hover {
+        background-color: ${({ backgroundColor }) => backgroundColor && lighten(0.1, backgroundColor)};
+      }
+    }
+  }
+`;
+
+const UpperButton = styled(Button)`
+  &:hover {
+    background-color: ${({ backgroundColor }) => backgroundColor && lighten(0.1, backgroundColor)};
+  }
+`;
+
+const LowerButton = styled(Button)`
+  &:hover {
+    background-color: ${({ backgroundColor }) => backgroundColor && lighten(0.1, backgroundColor)};
   }
 `;
