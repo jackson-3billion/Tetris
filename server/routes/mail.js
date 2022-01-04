@@ -30,9 +30,9 @@ router.post('/', (req, res) => {
 
   transporter.sendMail(mailDetails, err => {
     if (err) {
-      res.status(500).json({ msg: 'Error occurred', err });
+      res.status(500).json({ msg: 'Sorry! There is an error', err });
     } else {
-      res.status(200).json({ msg: 'Invitation mail sent successfully ' });
+      res.status(200).json({ msg: 'Invitation mail has been sent successfully ' });
     }
   });
 });
