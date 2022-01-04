@@ -2,27 +2,33 @@ import React, { useState, useEffect } from 'react';
 import styled from '@emotion/styled';
 
 const LoadingDots = () => {
-  const [dots, setDots] = useState('...');
+  const [num, setNum] = useState(2);
 
   useEffect(() => {
-    const updateDots = () =>
-      setDots((prevDots) => {
-        if (prevDots.length === 5) {
-          return '';
-        }
-        return prevDots + '.';
-      });
+    const updateDots = () => setNum((prevNum) => (prevNum + 1) % 6);
     const timerId = setInterval(updateDots, 800);
 
     return () => clearInterval(timerId);
   }, []);
 
-  return <LoadingIndicator>{dots}</LoadingIndicator>;
+  return (
+    <Dots>
+      {Array.from({ length: 5 }, (_, idx) => (
+        <Dot key={idx} visible={idx < num}>
+          .
+        </Dot>
+      ))}
+    </Dots>
+  );
 };
 
 export default LoadingDots;
 
-const LoadingIndicator = styled.span`
+const Dots = styled.span`
   color: white;
   font-size: 3vw;
+`;
+
+const Dot = styled.span`
+  color: ${({ visible }) => (visible ? 'white' : 'transparent')};
 `;
