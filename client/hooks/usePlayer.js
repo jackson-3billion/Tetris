@@ -8,7 +8,7 @@ const usePlayer = () => {
   const [player, setPlayer] = useState({
     pos: PLAYER_INITIAL_POS,
     tetromino: TETROMINOS['0'],
-    next: randomTetromino(),
+    next: TETROMINOS['0'],
     collided: false,
   });
 
@@ -25,7 +25,7 @@ const usePlayer = () => {
   const resetPlayer = useCallback(() => {
     setPlayer((prevPlayer) => ({
       pos: { ...PLAYER_INITIAL_POS },
-      tetromino: prevPlayer.next,
+      tetromino: prevPlayer.next.color === 'transparent' ? randomTetromino() : prevPlayer.next,
       next: randomTetromino(),
       collided: false,
     }));
