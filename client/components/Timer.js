@@ -36,7 +36,7 @@ const Timer = ({ playing, paused }) => {
   return (
     <TimerBox>
       <Minutes>{String(time.min).padStart(2, '0')}</Minutes>
-      <span>:</span>
+      <Colon>:</Colon>
       <Seconds>{String(time.sec).padStart(2, '0')}</Seconds>
     </TimerBox>
   );
@@ -45,9 +45,18 @@ const Timer = ({ playing, paused }) => {
 export default Timer;
 
 const TimerBox = styled.div`
-  position: absolute;
+  color: white;
+  font-size: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 8%;
 `;
 
 const Minutes = styled.span``;
+
+const Colon = styled.span`
+  margin: 0 0.5rem;
+`;
 
 const Seconds = styled.span``;

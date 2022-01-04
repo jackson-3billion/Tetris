@@ -38,13 +38,11 @@ const Wrapper = styled.div`
 
 const Options = styled.div`
   position: fixed;
-  top: 0;
-  right: 0;
+  top: 0.7rem;
+  right: 0.7rem;
   display: flex;
-  width: 20%;
-  min-width: 300px;
   z-index: 1;
   & > div {
-    font-size: 1.2rem;
+    margin-left: 1rem;
   }
 `;
