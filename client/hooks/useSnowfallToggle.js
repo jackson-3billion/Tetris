@@ -1,5 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import styled from '@emotion/styled';
+import { BsCloudSnowFill } from 'react-icons/bs';
 
 const useSnowfallToggle = () => {
   const [showSnowfall, setShowSnowfall] = useState(true);
@@ -8,7 +9,11 @@ const useSnowfallToggle = () => {
   const SnowfallToggler = () => (
     <Wrapper>
       <SnowfallCheckbox id="snowfall" type="checkbox" checked={showSnowfall} onChange={handleSnowfallToggle} />
-      <SnowfallLabel htmlFor="snowfall">Animation {showSnowfall ? 'ON' : 'OFF'}</SnowfallLabel>
+      <SnowfallLabel htmlFor="snowfall">
+        <Circle show={showSnowfall}>
+          <BsCloudSnowFill color="white" />
+        </Circle>
+      </SnowfallLabel>
     </Wrapper>
   );
 
@@ -17,10 +22,7 @@ const useSnowfallToggle = () => {
 
 export default useSnowfallToggle;
 
-const Wrapper = styled.div`
-  width: 100%;
-  min-width: 115px;
-`;
+const Wrapper = styled.div``;
 
 const SnowfallCheckbox = styled.input`
   display: none;
@@ -31,5 +33,20 @@ const SnowfallLabel = styled.label`
   cursor: pointer;
   &:hover {
     color: salmon;
+  }
+`;
+
+const Circle = styled.div`
+  width: 35px;
+  height: 35px;
+  border-radius: 300px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-right: 1px;
+  background-color: ${({ show }) => (show ? '#787586' : 'transparent')};
+  cursor: pointer;
+  &:hover {
+    border: 2px solid white;
   }
 `;

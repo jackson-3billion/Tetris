@@ -1,5 +1,6 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import styled from '@emotion/styled';
+import { ImMusic } from 'react-icons/im';
 
 const useBgmToggle = () => {
   const bgmRef = useRef(new Audio('../bgms/bgm.mp3'));
@@ -23,7 +24,11 @@ const useBgmToggle = () => {
   const BgmPlayer = () => (
     <Wrapper>
       <BgmToggler id="bgm" type="checkbox" checked={playing} onChange={handleBgmToggle} />
-      <BgmLabel htmlFor="bgm">BGM {playing ? 'ON' : 'OFF'}</BgmLabel>
+      <BgmLabel htmlFor="bgm">
+        <Circle show={playing}>
+          <ImMusic color="white" />
+        </Circle>
+      </BgmLabel>
     </Wrapper>
   );
 
@@ -32,10 +37,7 @@ const useBgmToggle = () => {
 
 export default useBgmToggle;
 
-const Wrapper = styled.div`
-  width: 100%;
-  min-width: 115px;
-`;
+const Wrapper = styled.div``;
 
 const BgmToggler = styled.input`
   display: none;
@@ -46,5 +48,20 @@ const BgmLabel = styled.label`
   cursor: pointer;
   &:hover {
     color: salmon;
+  }
+`;
+
+const Circle = styled.div`
+  width: 35px;
+  height: 35px;
+  border-radius: 300px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-right: 1px;
+  background-color: ${({ show }) => (show ? '#787586' : 'transparent')};
+  cursor: pointer;
+  &:hover {
+    border: 2px solid white;
   }
 `;
