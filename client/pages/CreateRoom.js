@@ -24,7 +24,7 @@ const CreateRoom = () => {
     <Wrapper>
       <Form onSubmit={handleCreateRoom}>
         <InputWrapper>
-          <input value={nickname} onChange={handleNicknameChange} placeholder="닉네임을 입력해주세요." />
+          <input value={nickname} onChange={handleNicknameChange} placeholder="Nickname" />
           <Warning visible={!!nickname.length} isValid={isValidNickname}>
             {msg}
           </Warning>

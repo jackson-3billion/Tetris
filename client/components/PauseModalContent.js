@@ -6,7 +6,7 @@ import { lighten } from 'polished';
 
 import Button from '@components/Button';
 
-const ModalContent = ({ player, callback, pauser }) => {
+const PauseModalContent = ({ callback, pauser }) => {
   return (
     <Wrapper>
       <Header>
@@ -23,7 +23,7 @@ const ModalContent = ({ player, callback, pauser }) => {
   );
 };
 
-export default ModalContent;
+export default PauseModalContent;
 
 const Wrapper = styled.div`
   position: relative;
