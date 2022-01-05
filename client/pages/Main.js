@@ -26,10 +26,10 @@ const Main = () => {
         ))}
       </RankList>
       <Buttons>
-        <LinkButton to="/game/create" hoverColor="#0f8a5f">
+        <LinkButton to="/game/create" hovercolor="#0f8a5f">
           Create
         </LinkButton>
-        <LinkButton to="/game/join" hoverColor="#0083D4">
+        <LinkButton to="/game/join" hovercolor="#0083D4">
           Join
         </LinkButton>
       </Buttons>
@@ -106,8 +106,8 @@ const LinkButton = styled(Link)`
   font-weight: bold;
 
   &:hover {
-    background-color: ${({ hoverColor }) => hoverColor};
-    border-color: ${({ hoverColor }) => hoverColor};
+    background-color: ${({ hovercolor }) => hovercolor};
+    border-color: ${({ hovercolor }) => hovercolor};
   }
 
   @media all and (max-width: 600px) {
