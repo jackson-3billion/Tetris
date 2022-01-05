@@ -9,7 +9,7 @@ import useBgmPlayer from '@hooks/useBgmPlayer';
 import { BGM_NUM } from '@utils/constants';
 
 const BgmPlayer = () => {
-  const [playing, playingIdx, handleBgmToggle, handlePrevClick, handleNextClick] = useBgmPlayer();
+  const [playing, playingIdx, setPlayingIdx, handleBgmToggle, handlePrevClick, handleNextClick] = useBgmPlayer();
 
   return (
     <Wrapper>
@@ -29,7 +29,7 @@ const BgmPlayer = () => {
       </Player>
       <Nav show={playing}>
         {Array.from({ length: BGM_NUM }, (_, idx) => (
-          <Dot key={idx} playing={idx === playingIdx}>
+          <Dot key={idx} playing={idx === playingIdx} onClick={() => setPlayingIdx(idx)}>
             <MdCircle size="8px" />
           </Dot>
         ))}
@@ -101,9 +101,9 @@ const Nav = styled.div`
 `;
 
 const Dot = styled.span`
+  cursor: pointer;
+  margin: -3px 2px 0;
   & > svg {
     fill: ${({ playing }) => (playing ? '#FFA58F' : 'white')};
   }
-
-  margin: -3px 2px 0;
 `;

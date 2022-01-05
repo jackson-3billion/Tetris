@@ -54,7 +54,7 @@ const useBgmPlayer = () => {
     }
   }, [playingIdx]);
 
-  return [playing, playingIdx, handleBgmToggle, handlePrevClick, handleNextClick];
+  return [playing, playingIdx, setPlayingIdx, handleBgmToggle, handlePrevClick, handleNextClick];
 };
 
 export default useBgmPlayer;
