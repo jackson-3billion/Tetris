@@ -3,20 +3,19 @@ import { Outlet } from 'react-router-dom';
 import styled from '@emotion/styled';
 
 import useSnowfallToggle from '@hooks/useSnowfallToggle';
-import useBgmToggle from '@hooks/useBgmToggle';
 
+import BgmPlayer from '@components/BgmPlayer';
 import Snowfall from '@components/Snowfall';
 import Home from '@components/Home';
 
 const Room = () => {
   const [showSnowfall, setShowSnowfall, SnowfallToggler] = useSnowfallToggle();
-  const [playing, setPlaying, BgmToggler] = useBgmToggle();
 
   return (
     <Wrapper>
       <Options>
+        <BgmPlayer />
         <SnowfallToggler />
-        <BgmToggler />
       </Options>
       {showSnowfall && <Snowfall />}
       <Outlet />
@@ -28,7 +27,6 @@ const Room = () => {
 export default Room;
 
 const Wrapper = styled.div`
-  //background-color: black;
   background-color: #292929;
   z-index: -1;
   position: absolute;
@@ -43,6 +41,6 @@ const Options = styled.div`
   display: flex;
   z-index: 1;
   & > div {
-    margin-left: 1rem;
+    margin-left: 3px;
   }
 `;
