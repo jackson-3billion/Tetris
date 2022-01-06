@@ -6,7 +6,7 @@ const server = http.createServer(app);
 const { Server } = require('socket.io');
 
 const mailRouter = require('./routes/mail');
-//const playerRouter = require('./routes/player');
+const playerRouter = require('./routes/player');
 
 if (process.env.NODE_ENV === 'development') {
   require('dotenv').config({ path: './.env.dev' });
@@ -21,7 +21,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/email', mailRouter);
-//app.use('/players', playerRouter);
+app.use('/players', playerRouter);
 
 const io = new Server(server, {
   cors: {
