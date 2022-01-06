@@ -4,14 +4,15 @@ const cors = require('cors');
 const http = require('http');
 const server = http.createServer(app);
 const { Server } = require('socket.io');
-const db = require('./db');
 
 if (process.env.NODE_ENV === 'development') {
   require('dotenv').config({ path: './.env.dev' });
 }
 
+const db = require('./db');
+
 const mailRouter = require('./routes/mail');
-//const playerRouter = require('./routes/player');
+const playerRouter = require('./routes/player');
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -19,12 +20,8 @@ app.use(cors({ origin: process.env.CLIENT_URL }));
 
 app.get('/', (req, res) => {
   db.query('select * from players', (err, row) => {
-    if (err) {
-      return res.json(err);
-    }
     res.send(row);
   });
-  //res.send('Hello World!');
 });
 
 app.use('/email', mailRouter);
@@ -37,7 +34,6 @@ const io = new Server(server, {
   },
 });
 
-const gameResult = {};
 io.on('connection', socket => {
   socket.on('join', gameRoomId => {
     const playerNum = getPlayerNum(io, gameRoomId);
@@ -55,7 +51,6 @@ io.on('connection', socket => {
 
     if (playerNum === 1) {
       io.to(gameRoomId).emit('isTwoPlayer', 'press start to play Tetris!');
-      gameResult[gameRoomId] = {};
     }
 
     socket.on('nickname', nickname => {
@@ -82,14 +77,7 @@ io.on('connection', socket => {
 
     socket.on('resume', () => io.to(gameRoomId).emit('paused', false));
 
-    socket.on('gameover', score => {
-      // gameResult[gameRoomId][socket.id] = score;
-      // if (Object.keys(gameResult[gameRoomId]).length === 2) {
-      //   io.to(gameRoomId).emit('gameover', { ...gameResult[gameRoomId] });
-      //   gameResult[gameRoomId] = {};
-      // }
-      socket.broadcast.to(gameRoomId).emit('opponentFinished', score);
-    });
+    socket.on('gameover', score => socket.broadcast.to(gameRoomId).emit('opponentFinished', score));
 
     socket.on('disconnect', () => {
       socket.leave(gameRoomId);
