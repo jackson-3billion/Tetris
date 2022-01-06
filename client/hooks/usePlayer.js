@@ -12,15 +12,6 @@ const usePlayer = () => {
     collided: false,
   });
 
-  const initPlayer = useCallback(() => {
-    setPlayer({
-      pos: PLAYER_INITIAL_POS,
-      tetromino: TETROMINOS['0'],
-      next: TETROMINOS['0'],
-      collided: false,
-    });
-  }, []);
-
   const movePlayer = ({ x, y }) => {
     setPlayer((prev) => ({
       ...prev,
@@ -61,7 +52,7 @@ const usePlayer = () => {
     player.tetromino.itemPos = rotateItem(player.tetromino.itemPos, rotatedTetromino.length, 1);
   };
 
-  return [player, setPlayer, initPlayer, movePlayer, resetPlayer, rotatePlayer];
+  return [player, setPlayer, movePlayer, resetPlayer, rotatePlayer];
 };
 
 export default usePlayer;

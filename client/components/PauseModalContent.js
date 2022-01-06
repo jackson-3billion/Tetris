@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React from 'react';
 import styled from '@emotion/styled';
 import { ImPause } from 'react-icons/im';
 import { FaPlay } from 'react-icons/fa';
@@ -7,18 +7,8 @@ import { lighten } from 'polished';
 import Button from '@components/Button';
 
 const PauseModalContent = ({ callback, pauser }) => {
-  const focusRef = useRef();
-
-  useEffect(() => setTimeout(() => focusRef?.current?.focus(), 10), []);
-
-  const handleKeyDown = ({ key }) => {
-    if (key === 'P' || key === 'p') {
-      callback();
-    }
-  };
-
   return (
-    <Wrapper ref={focusRef} role="button" tabIndex="0" onKeyDown={handleKeyDown}>
+    <Wrapper>
       <Header>
         <ImPause size="2rem" />
         <Title>PAUSED</Title>

@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback, useContext } from 'react';
 import { useLocation } from 'react-router-dom';
-import axios from 'axios';
 import styled from '@emotion/styled';
+import { css } from '@emotion/react';
 import { lighten } from 'polished';
 
 import StatusContext from '@contexts/status';
@@ -29,24 +29,20 @@ import {
   KEYHOLD_MAX_CNT,
 } from '@utils/constants';
 
-const Tetris = ({ gameRoomState, setPlaying, setRank, socketRef, sendPortalRef }) => {
+const Tetris = ({ gameRoomState, setPlaying, socketRef, sendPortalRef }) => {
   const { state: nickname } = useLocation();
-  const { playing, paused, isHost, isReady: isOpponentReady, opponentNickname } = gameRoomState;
+  const { playing, paused, isHost, isReady: isOpponentReady } = gameRoomState;
 
   // context
-  const {
-    state,
-    actions: { setAccel },
-  } = useContext(StatusContext);
+  const { state, actions } = useContext(StatusContext);
   const { level, items, accel, score, explodingPos, catJamming } = state;
 
   // local-state
   const [isReady, setIsReady] = useState(false); // guest 입장에서 필요 <-> isOpponentReady: host가 필요
-  const [finished, setFinished] = useState(false);
   const [pressedSpacebar, setPressedSpacebar] = useState(false);
 
   // custom hooks
-  const [player, setPlayer, initPlayer, movePlayer, resetPlayer, rotatePlayer] = usePlayer();
+  const [player, setPlayer, movePlayer, resetPlayer, rotatePlayer] = usePlayer();
   const [arena, setArena] = useArena(player, resetPlayer, setPlaying);
   const [dropInterval, setDropInterval, cancelAnimation] = useAnimationFrame(() => drop(), DROP_SLOW, playing);
 
@@ -60,27 +56,14 @@ const Tetris = ({ gameRoomState, setPlaying, setRank, socketRef, sendPortalRef }
     if (checkCollision(arena, player, DOWNWARD)) {
       // useArena에서 checkCollision return 하도록 바꿔보자
       if (player.pos.y <= 1) {
-        socketRef.current.emit('gameover', score);
-        return axios
-          .post('/players', { nickname, score })
-          .then((res) => {
-            setRank(res.data.ranking);
-            setPlaying(false);
-            setFinished(true);
-          })
-          .catch((err) => console.log(err.response.data.msg));
+        return setPlaying(false);
       }
       return setPlayer((prev) => ({ ...prev, collided: true }));
     }
     movePlayer(DOWNWARD);
-  }, [arena, movePlayer, player, setPlayer, setPlaying, setRank, nickname, score, socketRef]);
+  }, [arena, movePlayer, player, setPlayer, setPlaying]);
 
   useEffect(() => focusRef.current.focus());
-
-  useEffect(() => {
-    initPlayer();
-    setArena(createArena());
-  }, [opponentNickname, setArena, initPlayer]);
 
   // hook으로 빼낼 수 있을 듯
   useEffect(() => {
@@ -212,7 +195,7 @@ const Tetris = ({ gameRoomState, setPlaying, setRank, socketRef, sendPortalRef }
             removeOneRow(setArena, player);
           }, 500);
         case 'slower': // 자신에게 적용되는 아이템
-          return setAccel((accel) => accel - 1);
+          return actions.setAccel((accel) => accel - 1);
         case 'bomb': // 상대에게 적용되는 아이템
         case 'faster':
         case 'catjam':
@@ -226,7 +209,7 @@ const Tetris = ({ gameRoomState, setPlaying, setRank, socketRef, sendPortalRef }
           return;
       }
     }
-  }, [items, setArena, player, setAccel, socketRef, sendPortalRef]);
+  }, [items, setArena, player, actions, socketRef, sendPortalRef]);
 
   const dropToBottom = () => {
     let cnt = 1;
@@ -256,11 +239,7 @@ const Tetris = ({ gameRoomState, setPlaying, setRank, socketRef, sendPortalRef }
 
   const handleLowerButtonClick = useCallback(() => {
     const socket = socketRef.current;
-    if (paused) {
-      socket.emit('resume');
-    } else {
-      socket.emit('paused');
-    }
+    socket.emit('paused', !paused);
   }, [paused, socketRef]);
 
   const handleKeyUp = useCallback(
@@ -304,9 +283,6 @@ const Tetris = ({ gameRoomState, setPlaying, setRank, socketRef, sendPortalRef }
       case 'Spacebar':
       case ' ':
         return dropToBottom();
-      case 'P':
-      case 'p':
-        return handleLowerButtonClick();
       default:
     }
   };
@@ -331,18 +307,18 @@ const Tetris = ({ gameRoomState, setPlaying, setRank, socketRef, sendPortalRef }
           <Display title="Nickname">{nickname}</Display>
           <Display title="Level">{level}</Display>
           <Display title="Score">{score}</Display>
-          {!playing && !finished && (
+          {!playing && (
             <UpperButton
               callback={handleUpperButtonClick}
               backgroundColor={getButtonColor()}
               disabled={isHost && !isOpponentReady}
             >
-              {isHost ? 'START' : isReady ? "I'm Ready!'" : 'Get Ready'}
+              {isHost ? 'start' : isReady ? "I'm Ready!'" : 'Get Ready'}
             </UpperButton>
           )}
-          {playing && !finished && (
-            <LowerButton callback={handleLowerButtonClick} backgroundColor="#5e534f">
-              PAUSE
+          {playing && (
+            <LowerButton callback={handleLowerButtonClick} backgroundColor={paused ? 'salmon' : 'blue'}>
+              {paused ? 'resume' : 'pause'}
             </LowerButton>
           )}
         </aside>

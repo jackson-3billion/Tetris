@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useParams, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import styled from '@emotion/styled';
 import { lighten } from 'polished';
@@ -15,8 +16,10 @@ import { emailValidator } from '@utils/validate';
 
 const INITIAL_MSG = 'Invite Your Friend to Tetris Game! 🎮';
 
-const EmailSender = ({ gameRoomId, nickname, hideModal }) => {
+const EmailSender = ({ hideModal }) => {
   const emailRef = useRef();
+  const { id: gameRoomId } = useParams();
+  const { state: nickname } = useLocation();
 
   const [fetching, setFetching] = useState(false);
   const [msg, setMsg] = useState(INITIAL_MSG);
