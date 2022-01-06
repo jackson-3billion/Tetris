@@ -6,7 +6,6 @@ const server = http.createServer(app);
 const { Server } = require('socket.io');
 
 const mailRouter = require('./routes/mail');
-const playerRouter = require('./routes/player');
 
 if (process.env.NODE_ENV === 'development') {
   require('dotenv').config({ path: './.env.dev' });
@@ -21,7 +20,11 @@ app.get('/', (req, res) => {
 });
 
 app.use('/email', mailRouter);
-app.use('/players', playerRouter);
+
+// const db = require('./db');
+// db.query('select * from player', (_, rows) => {
+//   console.log(rows);
+// });
 
 const io = new Server(server, {
   cors: {
@@ -30,7 +33,6 @@ const io = new Server(server, {
   },
 });
 
-const gameResult = {};
 io.on('connection', socket => {
   socket.on('join', gameRoomId => {
     const playerNum = getPlayerNum(io, gameRoomId);
@@ -48,7 +50,6 @@ io.on('connection', socket => {
 
     if (playerNum === 1) {
       io.to(gameRoomId).emit('isTwoPlayer', 'press start to play Tetris!');
-      gameResult[gameRoomId] = {};
     }
 
     socket.on('nickname', nickname => {
@@ -56,6 +57,22 @@ io.on('connection', socket => {
     });
 
     const updatedEvents = ['arena-updated', 'score-updated', 'level-updated', 'preview-updated'];
+
+    // socket.on('arena-updated', arena => {
+    //   socket.broadcast.to(gameRoomId).emit('arena-updated', arena);
+    // });
+
+    // socket.on('score-updated', score => {
+    //   socket.broadcast.to(gameRoomId).emit('score-updated', score);
+    // });
+
+    // socket.on('level-updated', level => {
+    //   socket.broadcast.to(gameRoomId).emit('level-updated', level);
+    // });
+
+    // socket.on('preview-updated', preview => {
+    //   socket.broadcast.to(gameRoomId).emit('preview-updated', preview);
+    // });
 
     updatedEvents.forEach(event => {
       socket.on(event, data => {
@@ -74,15 +91,6 @@ io.on('connection', socket => {
     socket.on('paused', () => io.to(gameRoomId).emit('paused', socket.id));
 
     socket.on('resume', () => io.to(gameRoomId).emit('paused', false));
-
-    socket.on('gameover', score => {
-      // gameResult[gameRoomId][socket.id] = score;
-      // if (Object.keys(gameResult[gameRoomId]).length === 2) {
-      //   io.to(gameRoomId).emit('gameover', { ...gameResult[gameRoomId] });
-      //   gameResult[gameRoomId] = {};
-      // }
-      socket.broadcast.to(gameRoomId).emit('opponentFinished', score);
-    });
 
     socket.on('disconnect', () => {
       socket.leave(gameRoomId);
