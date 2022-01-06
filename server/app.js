@@ -25,7 +25,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/email', mailRouter);
-//app.use('/players', playerRouter);
+app.use('/players', playerRouter);
 
 const io = new Server(server, {
   cors: {
