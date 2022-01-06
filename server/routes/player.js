@@ -1,7 +1,3 @@
-if (process.env.NODE_ENV === 'development') {
-  require('dotenv').config({ path: './.env.dev' });
-}
-
 const router = require('express').Router();
 const db = require('../db');
 
