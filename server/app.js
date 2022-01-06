@@ -9,23 +9,23 @@ if (process.env.NODE_ENV === 'development') {
   require('dotenv').config({ path: './.env.dev' });
 }
 
-const db = require('./db');
+//const db = require('./db');
 
 const mailRouter = require('./routes/mail');
-const playerRouter = require('./routes/player');
+//const playerRouter = require('./routes/player');
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cors({ origin: process.env.CLIENT_URL }));
 
-app.get('/', (req, res) => {
-  db.query('select * from players', (err, row) => {
-    res.send(row);
-  });
-});
+// app.get('/', (req, res) => {
+//   db.query('select * from players', (err, row) => {
+//     res.send(row);
+//   });
+// });
 
 app.use('/email', mailRouter);
-app.use('/players', playerRouter);
+//app.use('/players', playerRouter);
 
 const io = new Server(server, {
   cors: {
