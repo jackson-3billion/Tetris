@@ -39,7 +39,7 @@ const useArena = (player, resetPlayer, setPlaying) => {
         rowsToSweep.push(y);
       }
 
-      actions.setScore((prevScore) => prevScore + SCORING[rowsToSweep.length]);
+      setTimeout(() => actions.setScore((prevScore) => prevScore + SCORING[rowsToSweep.length]), 0);
 
       rowsToSweep.forEach((line) => {
         newArena[line].forEach(([, , item]) => item && items.push(item));
@@ -53,8 +53,7 @@ const useArena = (player, resetPlayer, setPlaying) => {
       }
 
       if (uniqueItems.length) {
-        //setTimeout(() => actions.setItems([...uniqueItems]), 0);
-        actions.setItems([...uniqueItems]);
+        setTimeout(() => actions.setItems([...uniqueItems]), 0);
       }
 
       const newEmptyRows = Array.from(Array(rowsToSweep.length), () => new Array(ARENA_WIDTH).fill(['0', 'A']));

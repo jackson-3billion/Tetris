@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from '@emotion/styled';
 
 import useModal from '@hooks/useModal';
@@ -7,7 +7,7 @@ import Button from '@components/Button';
 import EmailSender from '@components/EmailSender';
 import LoadingDots from '@components/LoadingDots';
 
-const Invite = () => {
+const Invite = ({ gameRoomId, nickname }) => {
   const modalStyles = {
     padding: '0',
     width: '40%',
@@ -18,6 +18,14 @@ const Invite = () => {
     overlayColor: 'none',
   };
   const [isModalOpen, openModal, hideModal, ModalContainer] = useModal({ closableOverlay: true, styles: modalStyles });
+  const [isCopied, setIsCopied] = useState(false);
+
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(gameRoomId).then(() => {
+      setIsCopied(true);
+      setTimeout(() => setIsCopied(false), 2000);
+    });
+  };
 
   return (
     <Wrapper>
@@ -29,11 +37,13 @@ const Invite = () => {
         <InviteButton callback={openModal} backgroundColor="#2ecc71">
           Invite
         </InviteButton>
-        <CopyButton backgroundColor="#9b59b6">Copy Room ID</CopyButton>
+        <CopyButton callback={copyToClipboard} backgroundColor="#9b59b6">
+          {isCopied ? 'Copied!😎' : 'Copy Room ID'}
+        </CopyButton>
       </Buttons>
       {isModalOpen && (
         <ModalContainer>
-          <EmailSender hideModal={hideModal} />
+          <EmailSender gameRoomId={gameRoomId} nickname={nickname} hideModal={hideModal} />
         </ModalContainer>
       )}
     </Wrapper>
