@@ -93,7 +93,6 @@ const Header = styled.div`
   width: 100%;
   height: 4rem;
   padding: 0 2rem;
-  //background-color: #1f1f1f;
   background-color: #4c4c4c;
   display: flex;
   align-items: center;

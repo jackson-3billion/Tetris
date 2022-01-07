@@ -55,7 +55,6 @@ const Circle = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  //padding-right: 1px;
   background-color: ${({ show }) => (show ? '#787586' : 'transparent')};
   cursor: pointer;
   &:hover {

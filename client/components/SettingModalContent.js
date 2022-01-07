@@ -126,7 +126,7 @@ const Keys = styled.div`
 
 const Arrows = styled.div`
   & > span > svg {
-    margin: 0 2px;
+    margin-left: 4px;
   }
 `;
 
@@ -149,10 +149,11 @@ const OkayButton = styled(Button)`
   justify-content: center;
   align-items: center;
   width: 8rem;
-  border-radius: 10px;
+  border-radius: 5px;
   padding: 0.5rem 0;
   background-color: #d5cabd;
   font-size: 1.4rem;
+  font-weight: bold;
   color: black;
   &:hover {
     background-color: ${lighten(0.1, '#D5CABD')};
@@ -164,6 +165,7 @@ const Key = styled.div`
   height: 24px;
   background-color: white;
   font-size: 1rem;
+  font-weight: bold;
   color: #737373;
   border-radius: 3px;
   display: flex;
@@ -176,6 +178,7 @@ const SpaceKey = styled.div`
   height: 24px;
   background-color: white;
   font-size: 1rem;
+  font-weight: bold;
   color: #737373;
   border-radius: 3px;
   display: flex;

@@ -19,10 +19,6 @@ const JoinRoom = () => {
     if (!isValidNickname) {
       return;
     }
-    // server 로 axios 요청 => gameRoomId로 만들어진 방의 존재여부 확인
-    // false => modal => "존재하지 않는 gameRoom 입니다"
-    // true => navigate
-
     navigate(`/game/${gameRoomId}`, { state: nickname });
   };
 
@@ -46,7 +42,6 @@ export default JoinRoom;
 
 const Wrapper = styled.div`
   height: 100vh;
-  //background-color: #e9eaed;
   display: flex;
   justify-content: center;
   align-items: center;
