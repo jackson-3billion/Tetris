@@ -22,7 +22,9 @@ const useSnowfallToggle = () => {
 
 export default useSnowfallToggle;
 
-const Wrapper = styled.div``;
+const Wrapper = styled.div`
+  margin-right: 1rem;
+`;
 
 const SnowfallCheckbox = styled.input`
   display: none;
