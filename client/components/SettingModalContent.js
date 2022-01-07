@@ -36,8 +36,8 @@ const SettingModalContent = ({ handleOkay }) => {
           Arrow keys
           <span>
             <BsFillArrowLeftSquareFill color="white" size="1.5rem" />
-            <BsFillArrowRightSquareFill color="white" size="1.5rem" />
             <BsFillArrowDownSquareFill color="white" size="1.5rem" />
+            <BsFillArrowRightSquareFill color="white" size="1.5rem" />
           </span>
         </Arrows>
         <Rotate>
