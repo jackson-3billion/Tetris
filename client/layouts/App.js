@@ -11,6 +11,7 @@ const Create = loadable(() => import('@pages/CreateRoom'));
 const Join = loadable(() => import('@pages/JoinRoom'));
 const Game = loadable(() => import('@pages/GameRoom'));
 const Full = loadable(() => import('@pages/FullRoom'));
+const NotFound = loadable(() => import('@pages/NotFound'));
 
 const App = () => {
   const {
@@ -33,6 +34,7 @@ const App = () => {
           <Route path=":id" element={<Game />} />
           <Route path="full" element={<Full />} />
         </Route>
+        <Route path={'*'} element={<NotFound />} />
       </Routes>
     </>
   );

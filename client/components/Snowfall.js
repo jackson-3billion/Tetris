@@ -38,8 +38,6 @@ const Snowfall = () => {
 export default Snowfall;
 
 const Canvas = styled.canvas`
-  //background-color: black;
-  //background-color: #0f8a5f;
   background-color: #292929;
   position: absolute;
   z-index: -1;

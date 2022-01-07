@@ -9,15 +9,11 @@ if (process.env.NODE_ENV === 'development') {
   require('dotenv').config({ path: './.env.dev' });
 }
 
+app.use(cors({ origin: process.env.CLIENT_URL }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cors());
-
-const mailRouter = require('./routes/mail');
-const playerRouter = require('./routes/player');
-
-app.use('/email', mailRouter);
-app.use('/players', playerRouter);
+app.use('/email', require('./routes/mail'));
+app.use('/players', require('./routes/player'));
 
 const io = new Server(server, {
   cors: {

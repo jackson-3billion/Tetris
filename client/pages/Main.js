@@ -87,7 +87,7 @@ const Error = styled.div`
 `;
 
 const RankList = styled.div`
-  width: 20%;
+  width: 30%;
   min-width: 300px;
 
   text-align: center;
@@ -116,7 +116,7 @@ const RankItem = styled.div`
 `;
 
 const Rank = styled.span`
-  flex-basis: 20%;
+  flex-basis: 10%;
   text-align: left;
   & > span:nth-of-type(2) {
     font-size: 1.5rem;
@@ -124,11 +124,11 @@ const Rank = styled.span`
 `;
 
 const Score = styled.span`
-  flex-basis: 40%;
+  flex-basis: 30%;
 `;
 
 const Nickname = styled.span`
-  flex-basis: 40%;
+  flex-basis: 60%;
 `;
 
 const Buttons = styled.div`
