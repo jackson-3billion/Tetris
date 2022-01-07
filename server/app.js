@@ -16,7 +16,7 @@ const playerRouter = require('./routes/player');
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cors({ origin: process.env.CLIENT_URL }));
+app.use(cors());
 
 // app.get('/', (req, res) => {
 //   db.query('select * from players', (err, row) => {
