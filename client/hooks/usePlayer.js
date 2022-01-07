@@ -1,10 +1,16 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useContext } from 'react';
+
+import StatusContext from '@contexts/status';
 
 import { TETROMINOS, randomTetromino } from '@utils/tetrominos';
 import { PLAYER_INITIAL_POS } from '@utils/constants';
 import { checkCollision, rotateMatrix, rotateItem } from '@utils/gameHelper';
 
 const usePlayer = () => {
+  const {
+    state: { direction },
+  } = useContext(StatusContext);
+
   const [player, setPlayer] = useState({
     pos: PLAYER_INITIAL_POS,
     tetromino: TETROMINOS['0'],
@@ -41,9 +47,9 @@ const usePlayer = () => {
   }, []);
 
   const rotatePlayer = (arena) => {
-    const rotatedTetromino = rotateMatrix(player.tetromino.shape, -1);
+    const rotatedTetromino = rotateMatrix(player.tetromino.shape, direction);
     player.tetromino.shape = rotatedTetromino;
-    player.tetromino.itemPos = rotateItem(player.tetromino.itemPos, rotatedTetromino.length, -1);
+    player.tetromino.itemPos = rotateItem(player.tetromino.itemPos, rotatedTetromino.length, direction);
     if (!checkCollision(arena, player, { x: 0, y: 0 })) {
       return setPlayer({ ...player });
     }
@@ -57,8 +63,8 @@ const usePlayer = () => {
       }
     }
 
-    player.tetromino.shape = rotateMatrix(player.tetromino.shape, 1);
-    player.tetromino.itemPos = rotateItem(player.tetromino.itemPos, rotatedTetromino.length, 1);
+    player.tetromino.shape = rotateMatrix(player.tetromino.shape, -direction);
+    player.tetromino.itemPos = rotateItem(player.tetromino.itemPos, rotatedTetromino.length, -direction);
   };
 
   return [player, setPlayer, initPlayer, movePlayer, resetPlayer, rotatePlayer];
