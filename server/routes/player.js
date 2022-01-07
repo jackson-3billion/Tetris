@@ -2,7 +2,8 @@ const router = require('express').Router();
 const pool = require('../db');
 
 router.get('/', (req, res) => {
-  pool.query('select * from players', (err, rows) => {
+  const query = 'SELECT * FROM players ORDER BY score DESC LIMIT 5';
+  pool.query(query, (err, rows) => {
     if (err) {
       return res.status(500).json({ msg: 'Internal Server Error', err });
     }
@@ -33,7 +34,7 @@ router.post('/', (req, res) => {
       if (err) {
         return res.status(500).json({ msg: 'Internal Server Error', err });
       }
-      const ranking = data.findIndex(row => row.id === insertId);
+      const ranking = data?.findIndex(row => row.id === insertId) + 1;
       res.status(201).json({ msg: 'player score inserted', ranking });
     });
   });
