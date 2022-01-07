@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styled from '@emotion/styled';
 
-const LoadingDots = () => {
+const LoadingDots = ({ size }) => {
   const [num, setNum] = useState(2);
 
   useEffect(() => {
@@ -26,7 +26,7 @@ export default LoadingDots;
 
 const Dots = styled.span`
   color: white;
-  font-size: 3vw;
+  font-size: ${({ size }) => (size ? size : '3vw')};
 `;
 
 const Dot = styled.span`
