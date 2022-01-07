@@ -3,6 +3,7 @@ import { Outlet } from 'react-router-dom';
 import styled from '@emotion/styled';
 
 import useSnowfallToggle from '@hooks/useSnowfallToggle';
+import useSetting from '@hooks/useSetting';
 
 import BgmPlayer from '@components/BgmPlayer';
 import Snowfall from '@components/Snowfall';
@@ -10,15 +11,17 @@ import Home from '@components/Home';
 
 const Room = () => {
   const [showSnowfall, setShowSnowfall, SnowfallToggler] = useSnowfallToggle();
+  const [toggleSettingModal, SettingModal] = useSetting();
 
   return (
     <Wrapper>
       <Options>
         <BgmPlayer />
         <SnowfallToggler />
+        <SettingModal />
       </Options>
       {showSnowfall && <Snowfall />}
-      <Outlet />
+      <Outlet context={[toggleSettingModal]} />
       <Home />
     </Wrapper>
   );
