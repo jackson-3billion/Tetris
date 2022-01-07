@@ -40,7 +40,9 @@ const BgmPlayer = () => {
 
 export default BgmPlayer;
 
-const Wrapper = styled.div``;
+const Wrapper = styled.div`
+  margin-right: 3px;
+`;
 
 const Prev = styled.div``;
 
