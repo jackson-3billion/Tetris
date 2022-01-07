@@ -5,24 +5,16 @@ const http = require('http');
 const server = http.createServer(app);
 const { Server } = require('socket.io');
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-app.use(cors());
-
 if (process.env.NODE_ENV === 'development') {
   require('dotenv').config({ path: './.env.dev' });
 }
 
-//const db = require('./db');
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(cors());
 
 const mailRouter = require('./routes/mail');
 const playerRouter = require('./routes/player');
-
-// app.get('/', (req, res) => {
-//   db.query('select * from players', (err, row) => {
-//     res.send(row);
-//   });
-// });
 
 app.use('/email', mailRouter);
 app.use('/players', playerRouter);
