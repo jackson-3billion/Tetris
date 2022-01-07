@@ -22,7 +22,6 @@ const useAnimationFrame = (callback, delay, started) => {
     }
 
     const update = (time = 0) => {
-      console.log(`update called ${playing}`);
       if (!playing) {
         return cancelAnimationFrame(requestIdRef.current);
       }

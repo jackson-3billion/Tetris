@@ -15,7 +15,10 @@ router.post('/', (req, res) => {
   const insertSql = `
   INSERT INTO players (nickname, score) 
               VALUES ("${nickname}", ${score})`;
-  pool.query(insertSql, (err, { insertId }) => {
+  pool.query(insertSql, (err, result) => {
+    console.log(result);
+    const insertId = result.insertId;
+    console.log(insertId);
     if (err) {
       return res.status(500).json({ msg: 'Internal Server Error', err });
     }
