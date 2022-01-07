@@ -1,20 +1,44 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 import styled from '@emotion/styled';
-
-import { rankList } from '@utils/dummy';
+import { css } from '@emotion/react';
+import { BiError } from 'react-icons/bi';
 
 import Logo from '@components/Logo';
+import LoadingDots from '@components/LoadingDots';
 
 const ordinalMapper = ['st', 'nd', 'rd', 'th', 'th'];
 
 const Main = () => {
+  const [list, setList] = useState([]);
+  const [isFetching, setIsFetching] = useState(false);
+  const [isError, setIsError] = useState(false);
+
+  useEffect(() => {
+    setIsFetching(true);
+    axios
+      .get('/players')
+      .then(({ data: { data } }) => {
+        setList(data);
+      })
+      .catch(() => setIsError(true))
+      .finally(() => setIsFetching(false));
+  }, []);
+
   return (
     <Wrapper>
       <Logo />
-      <RankList>
+      <RankList isError={isError || isFetching}>
         <Title>Best Players</Title>
-        {rankList.map(({ score, nickname }, idx) => (
+        {isError && (
+          <Error>
+            <BiError size="100%" />
+            <div>Sorry! Server is not available now</div>
+          </Error>
+        )}
+        {isFetching && <LoadingDots />}
+        {list.map(({ score, nickname }, idx) => (
           <RankItem key={idx} idx={idx}>
             <Rank>
               <span>{idx + 1}</span>
@@ -50,9 +74,32 @@ const Wrapper = styled.div`
   color: #f6f7fb;
 `;
 
+const Error = styled.div`
+  width: 20vw;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  & > div {
+    text-align: center;
+    font-size: 1.2rem;
+  }
+`;
+
 const RankList = styled.div`
   width: 20%;
   min-width: 300px;
+
+  text-align: center;
+  ${({ isError }) => {
+    isError &&
+      css`
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      `;
+  }};
 `;
 
 const Title = styled.div`
