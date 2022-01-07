@@ -75,6 +75,7 @@ const Wrapper = styled.div`
 `;
 
 const Error = styled.div`
+  margin: 0 auto;
   width: 20vw;
   display: flex;
   flex-direction: column;
@@ -87,7 +88,7 @@ const Error = styled.div`
 `;
 
 const RankList = styled.div`
-  width: 30%;
+  width: 27%;
   min-width: 300px;
 
   text-align: center;
