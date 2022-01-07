@@ -59,4 +59,10 @@ const StyledArena = styled.div`
     css`
       transform: rotate(-180deg);
     `}
+
+  @media all and (max-width: 500px) {
+    width: 244px;
+    grid-template-rows: repeat(20, 20px);
+    grid-template-columns: repeat(12, 20px);
+  }
 `;
