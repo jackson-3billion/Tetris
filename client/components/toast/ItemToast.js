@@ -37,13 +37,21 @@ const moveDownAndUp = keyframes`
 const Wrapper = styled.div`
   position: absolute;
   animation: ${({ isSending }) => (isSending ? moveUpAndDown : moveDownAndUp)} 1s forwards ease-in-out;
+  height: 10vh;
+  overflow: ${({ isSending }) => (isSending ? 'hidden' : 'visible')};
+  display: flex;
+  justify-content: ${({ isSending }) => (isSending ? 'flex-start' : 'flex-end')};
+  align-content: ${({ isSending }) => (isSending ? 'flex-start' : 'flex-end')};
 `;
 
 const ToastBox = styled.div`
   animation: ${({ isSending }) => (isSending ? moveRight : moveLeft)} 1s forwards ease-in-out;
   display: flex;
+  width: 35vw;
+  justify-content: ${({ isSending }) => (isSending ? 'flex-start' : 'flex-end')};
+  align-content: ${({ isSending }) => (isSending ? 'flex-start' : 'flex-end')};
 `;
 
 const ToastIcon = styled.div`
-  width: 20%;
+  width: 60px;
 `;

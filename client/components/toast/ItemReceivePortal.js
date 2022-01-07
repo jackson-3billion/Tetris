@@ -32,11 +32,18 @@ export default ItemReceivePortal;
 
 const ItemToastContainer = styled.div`
   position: absolute;
-  top: calc(50% + 100px);
-  left: 30%;
-  width: 20%;
+  width: 40%;
+  height: 10%;
+  left: 50%;
+  margin-left: calc(-20%);
+  top: 50%;
+  margin-top: 0;
 `;
 
 const InnerContainer = styled.div`
   position: relative;
+  height: 100%;
+
+  display: flex;
+  justify-content: flex-end;
 `;

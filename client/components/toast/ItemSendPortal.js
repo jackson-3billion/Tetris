@@ -32,11 +32,15 @@ export default ItemSendPortal;
 
 const ItemToastContainer = styled.div`
   position: absolute;
+  width: 40%;
+  height: 10%;
+  left: 50%;
+  margin-left: calc(-20%);
   top: 50%;
-  left: 30%;
-  width: 20%;
+  margin-top: calc(-5%);
 `;
 
 const InnerContainer = styled.div`
   position: relative;
+  height: 100%;
 `;
