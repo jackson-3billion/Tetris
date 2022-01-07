@@ -15,6 +15,11 @@ https://react-tetris-retro.netlify.app/
 ## Control
 <img src="https://user-images.githubusercontent.com/38288479/148589684-56e439c1-51b0-4eb4-bd50-f2c0679dfef5.png" />
 
+## BGM
+- https://www.youtube.com/watch?v=TK4V6vIFPGo
+- https://www.youtube.com/watch?v=ltCULQ-e6tc
+- https://www.youtube.com/watch?v=-q4w17qx6y8
+
 ## Tech Stack
 
 ### `Client`  
@@ -22,3 +27,6 @@ https://react-tetris-retro.netlify.app/
 
 ### `Server`  
 <img src="https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white" />&nbsp;<img src="https://img.shields.io/badge/MySQL-005C84?style=for-the-badge&logo=mysql&logoColor=white" />&nbsp;<img src="https://img.shields.io/badge/Socket.io-010101?&style=for-the-badge&logo=Socket.io&logoColor=white" />&nbsp;<img src="https://img.shields.io/badge/Heroku-430098?style=for-the-badge&logo=heroku&logoColor=white" />
+
+## WiKi
+https://github.com/jch422/Tetris/wiki
