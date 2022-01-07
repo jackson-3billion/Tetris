@@ -5,7 +5,7 @@ import StatusContext from '@contexts/status';
 import { createArena } from '@utils/gameHelper';
 import { ARENA_HEIGHT, ARENA_WIDTH, SCORING } from '@utils/constants';
 
-const useArena = (player, resetPlayer, setPlaying) => {
+const useArena = (player, resetPlayer) => {
   const [arena, setArena] = useState(createArena());
   const {
     state: { explodingPos },
@@ -64,7 +64,7 @@ const useArena = (player, resetPlayer, setPlaying) => {
 
       return [...newEmptyRows, ...newArena];
     });
-  }, [player, resetPlayer, setPlaying, actions]);
+  }, [player, resetPlayer, actions]);
 
   useEffect(() => {
     if (!explodingPos) return;

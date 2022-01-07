@@ -47,7 +47,7 @@ const GameRoom = () => {
 
   const handleStateChange = useCallback((k) => (v) => dispatch({ payload: { [k]: v } }), []);
   const handleResume = useCallback(() => socketRef?.current?.emit('resume'), [socketRef]);
-  const reload = () => window.location.reload();
+  const handleReplayClick = useCallback(() => socketRef.current?.emit('replay'), [socketRef]);
   const reset = () =>
     dispatch({
       payload: {
@@ -91,6 +91,7 @@ const GameRoom = () => {
     socket.on('start', () => dispatch({ payload: { playing: true, isGameOver: false, isWinner: false } }));
     socket.on('paused', (paused) => dispatch({ payload: { paused: !!paused, isPauser: paused === socket.id } }));
     socket.on('opponentFinished', (score) => oopActionsRef.current.setFinalScore(score));
+    socket.on('replay', () => window.location.reload());
     socket.on('opponentLeft', reset);
 
     socket.on('item', (item) => {
@@ -190,7 +191,7 @@ const GameRoom = () => {
       )}
       {isGameOverModalOpen && (
         <GameOverModal>
-          <GameOverModalContent rank={rank} callback={reload} />
+          <GameOverModalContent rank={rank} callback={handleReplayClick} />
         </GameOverModal>
       )}
       {isPauseModalOpen && (

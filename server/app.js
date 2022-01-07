@@ -12,7 +12,7 @@ if (process.env.NODE_ENV === 'development') {
 //const db = require('./db');
 
 const mailRouter = require('./routes/mail');
-//const playerRouter = require('./routes/player');
+const playerRouter = require('./routes/player');
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -25,7 +25,7 @@ app.use(cors({ origin: process.env.CLIENT_URL }));
 // });
 
 app.use('/email', mailRouter);
-//app.use('/players', playerRouter);
+app.use('/players', playerRouter);
 
 const io = new Server(server, {
   cors: {
@@ -78,6 +78,8 @@ io.on('connection', socket => {
     socket.on('resume', () => io.to(gameRoomId).emit('paused', false));
 
     socket.on('gameover', score => socket.broadcast.to(gameRoomId).emit('opponentFinished', score));
+
+    socket.on('replay', () => io.to(gameRoomId).emit('replay'));
 
     socket.on('disconnect', () => {
       socket.leave(gameRoomId);

@@ -1,8 +1,8 @@
 const router = require('express').Router();
-const db = require('../db');
+const pool = require('../db');
 
 router.get('/', (req, res) => {
-  db.query('select * from players', (err, rows) => {
+  pool.query('select * from players', (err, rows) => {
     if (err) {
       return res.status(500).json({ msg: 'Internal Server Error', err });
     }
@@ -15,7 +15,7 @@ router.post('/', (req, res) => {
   const insertSql = `
   INSERT INTO players (nickname, score) 
               VALUES ("${nickname}", ${score})`;
-  db.query(insertSql, (err, { insertId }) => {
+  pool.query(insertSql, (err, { insertId }) => {
     if (err) {
       return res.status(500).json({ msg: 'Internal Server Error', err });
     }
@@ -25,7 +25,7 @@ router.post('/', (req, res) => {
           OVER(ORDER BY score DESC) AS ranking 
           FROM players) ranklist 
     WHERE ranklist.id = ${insertId};`;
-    db.query(rankSql, (err, data) => {
+    pool.query(rankSql, (err, data) => {
       if (err) {
         return res.status(500).json({ msg: 'Internal Server Error', err });
       }

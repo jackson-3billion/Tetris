@@ -47,8 +47,12 @@ const Tetris = ({ gameRoomState, setPlaying, setRank, socketRef, sendPortalRef }
 
   // custom hooks
   const [player, setPlayer, initPlayer, movePlayer, resetPlayer, rotatePlayer] = usePlayer();
-  const [arena, setArena] = useArena(player, resetPlayer, setPlaying);
-  const [dropInterval, setDropInterval, cancelAnimation] = useAnimationFrame(() => drop(), DROP_SLOW, playing);
+  const [arena, setArena] = useArena(player, resetPlayer);
+  const [dropInterval, setDropInterval, animating, setAnimating, cancelAnimation] = useAnimationFrame(
+    () => drop(),
+    DROP_SLOW,
+    playing,
+  );
 
   // ref
   const focusRef = useRef();
@@ -57,23 +61,24 @@ const Tetris = ({ gameRoomState, setPlaying, setRank, socketRef, sendPortalRef }
   const catJamBgmRef = useRef(new Audio('../bgms/cat-jam.mp3'));
 
   const drop = useCallback(() => {
+    if (!animating) return;
     if (checkCollision(arena, player, DOWNWARD)) {
       // useArena에서 checkCollision return 하도록 바꿔보자
       if (player.pos.y <= 1) {
         socketRef.current.emit('gameover', score);
-        return axios
+        setAnimating(false);
+        setPlaying(false);
+        setFinished(true);
+        axios
           .post('/players', { nickname, score })
-          .then((res) => {
-            setRank(res.data.ranking);
-            setPlaying(false);
-            setFinished(true);
-          })
+          .then((res) => setRank(res.data.ranking))
           .catch((err) => console.log(err.response.data.msg));
+        return;
       }
       return setPlayer((prev) => ({ ...prev, collided: true }));
     }
     movePlayer(DOWNWARD);
-  }, [arena, movePlayer, player, setPlayer, setPlaying, setRank, nickname, score, socketRef]);
+  }, [arena, movePlayer, player, setPlayer, setPlaying, setRank, nickname, score, socketRef, animating, setAnimating]);
 
   useEffect(() => focusRef.current.focus());
 
@@ -126,8 +131,9 @@ const Tetris = ({ gameRoomState, setPlaying, setRank, socketRef, sendPortalRef }
     if (playing) {
       setArena(createArena());
       resetPlayer();
+      setAnimating(true);
     }
-  }, [playing, setArena, resetPlayer]);
+  }, [playing, setArena, resetPlayer, setAnimating]);
 
   useEffect(() => {
     if (!playing) return;
