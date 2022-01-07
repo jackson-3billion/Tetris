@@ -12,8 +12,6 @@ router.get('/', (req, res) => {
 
 router.post('/', (req, res) => {
   const { nickname, score } = req.body;
-  console.log('------------------------------------');
-  console.log(`${nickname}, ${score}`);
   const insertSql = `
   INSERT INTO players (nickname, score) 
               VALUES ("${nickname}", ${score})`;
@@ -21,20 +19,22 @@ router.post('/', (req, res) => {
     if (err) {
       return res.status(500).json({ msg: 'Internal Server Error', err });
     }
-    console.log(result);
-    const insertId = result.insertId;
-    console.log(insertId);
+    const { insertId } = result;
+    /*
     const rankSql = `
     SELECT ranking 
     FROM (SELECT *, dense_rank() 
           OVER(ORDER BY score DESC) AS ranking 
           FROM players) ranklist 
     WHERE ranklist.id = ${insertId};`;
+    */
+    const rankSql = 'SELECT id FROM players ORDER BY score DESC';
     pool.query(rankSql, (err, data) => {
       if (err) {
         return res.status(500).json({ msg: 'Internal Server Error', err });
       }
-      res.status(201).json({ msg: 'player score inserted', ranking: data[0].ranking });
+      const ranking = data.findIndex(row => row.id === insertId);
+      res.status(201).json({ msg: 'player score inserted', ranking });
     });
   });
 });
