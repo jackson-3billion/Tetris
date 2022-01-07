@@ -12,16 +12,18 @@ router.get('/', (req, res) => {
 
 router.post('/', (req, res) => {
   const { nickname, score } = req.body;
+  console.log('------------------------------------');
+  console.log(`${nickname}, ${score}`);
   const insertSql = `
   INSERT INTO players (nickname, score) 
               VALUES ("${nickname}", ${score})`;
   pool.query(insertSql, (err, result) => {
-    console.log(result);
-    const insertId = result.insertId;
-    console.log(insertId);
     if (err) {
       return res.status(500).json({ msg: 'Internal Server Error', err });
     }
+    console.log(result);
+    const insertId = result.insertId;
+    console.log(insertId);
     const rankSql = `
     SELECT ranking 
     FROM (SELECT *, dense_rank() 
