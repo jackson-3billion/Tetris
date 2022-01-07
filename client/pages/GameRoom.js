@@ -224,6 +224,10 @@ const initialState = {
 
 const Wrapper = styled.div`
   height: 100%;
+
+  /* @media all and (max-width: 800px) {
+    width: 100%;
+  } */
 `;
 
 const InnerWrapper = styled.div`

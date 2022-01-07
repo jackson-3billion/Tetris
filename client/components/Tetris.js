@@ -4,6 +4,13 @@ import axios from 'axios';
 import styled from '@emotion/styled';
 import { lighten } from 'polished';
 
+import {
+  BsFillArrowLeftCircleFill,
+  BsFillArrowDownCircleFill,
+  BsFillArrowRightCircleFill,
+  BsFillArrowUpCircleFill,
+} from 'react-icons/bs';
+
 import StatusContext from '@contexts/status';
 
 import useArena from '@hooks/useArena';
@@ -62,6 +69,7 @@ const Tetris = ({ gameRoomState, setPlaying, setRank, socketRef, sendPortalRef }
   const newIntervalRef = useRef(DROP_SLOW);
   const keyHoldCounterRef = useRef(0);
   const catJamBgmRef = useRef(new Audio('../bgms/cat-jam.mp3'));
+  const arrowLeftRef = useRef();
 
   const drop = useCallback(() => {
     if (!animating) return;
@@ -198,6 +206,14 @@ const Tetris = ({ gameRoomState, setPlaying, setRank, socketRef, sendPortalRef }
     const socket = socketRef.current;
     socket.emit('preview-updated', player.next.preview);
   }, [player.next, socketRef]);
+
+  useEffect(() => {
+    arrowLeftRef.current.dispatchEvent(
+      new KeyboardEvent('keydown', {
+        key: 'ArrowLeft',
+      }),
+    );
+  }, []);
 
   useEffect(() => {
     const socket = socketRef.current;
@@ -358,6 +374,23 @@ const Tetris = ({ gameRoomState, setPlaying, setRank, socketRef, sendPortalRef }
             </LowerButton>
           )}
         </aside>
+        <MobileButtons>
+          <span ref={arrowLeftRef}>
+            <BsFillArrowLeftCircleFill size="50px" color="#B0A8B9" />
+          </span>
+          <span>
+            <BsFillArrowDownCircleFill size="50px" color="#B0A8B9" />
+          </span>
+          <span>
+            <BsFillArrowRightCircleFill size="50px" color="#B0A8B9" />
+          </span>
+          <span>
+            <BsFillArrowUpCircleFill size="50px" color="#B0A8B9" />
+          </span>
+          <span>
+            <span>Drop</span>
+          </span>
+        </MobileButtons>
       </TetrisGame>
       {catJamming && <CatJamGif catJamBgmRef={catJamBgmRef} isOpponent={false} />}
     </TetrisWrapper>
@@ -375,6 +408,10 @@ const TetrisWrapper = styled.div`
   overflow: hidden;
   &:focus {
     outline: none;
+  }
+
+  @media all and (max-width: 500px) {
+    width: 100%;
   }
 `;
 
@@ -397,6 +434,13 @@ const TetrisGame = styled.div`
         background-color: ${({ backgroundColor }) => backgroundColor && lighten(0.1, backgroundColor)};
       }
     }
+    @media all and (max-width: 500px) {
+      width: 100px;
+      margin-left: auto;
+    }
+  }
+  @media all and (max-width: 500px) {
+    width: 100%;
   }
 `;
 
@@ -409,5 +453,52 @@ const UpperButton = styled(Button)`
 const LowerButton = styled(Button)`
   &:hover {
     background-color: ${({ backgroundColor }) => backgroundColor && lighten(0.1, backgroundColor)};
+  }
+`;
+
+const MobileButtons = styled.div`
+  @media all and (min-width: 501px) {
+    display: none;
+  }
+  & > span {
+    position: absolute;
+    border: 2px solid white;
+    border-radius: 300px;
+    width: 54px;
+    height: 62px;
+
+    &:nth-of-type(1) {
+      left: 2rem;
+      bottom: 4rem;
+    }
+    &:nth-of-type(2) {
+      left: 5rem;
+      bottom: 2rem;
+    }
+    &:nth-of-type(3) {
+      left: 8rem;
+      bottom: 4rem;
+    }
+    &:nth-of-type(4) {
+      left: 5rem;
+      bottom: 6rem;
+    }
+    &:nth-of-type(5) {
+      right: 5rem;
+      bottom: 4rem;
+      width: 54px;
+      height: 62px;
+
+      & > span {
+        background-color: #b0a8b9;
+        border-radius: 300px;
+        width: 50px;
+        height: 50px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-weight: bold;
+      }
+    }
   }
 `;
