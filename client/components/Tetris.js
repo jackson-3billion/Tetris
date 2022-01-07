@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback, useContext } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useOutletContext } from 'react-router-dom';
 import axios from 'axios';
 import styled from '@emotion/styled';
 import { lighten } from 'polished';
@@ -39,6 +39,9 @@ const Tetris = ({ gameRoomState, setPlaying, setRank, socketRef, sendPortalRef }
     actions: { setAccel },
   } = useContext(StatusContext);
   const { level, items, accel, score, explodingPos, catJamming } = state;
+
+  // outlet context
+  const [toggleSettingModal] = useOutletContext();
 
   // local-state
   const [isReady, setIsReady] = useState(false); // guest 입장에서 필요 <-> isOpponentReady: host가 필요
@@ -287,7 +290,7 @@ const Tetris = ({ gameRoomState, setPlaying, setRank, socketRef, sendPortalRef }
   }, []);
 
   const handleKeyDown = ({ key, repeat }) => {
-    if (!playing || paused) return;
+    if (key !== 'S' && key !== 's' && (!playing || paused)) return;
     switch (key) {
       case 'ArrowLeft':
         if (checkCollision(arena, player, LEFTWARD) || player.collided) return;
@@ -313,6 +316,9 @@ const Tetris = ({ gameRoomState, setPlaying, setRank, socketRef, sendPortalRef }
       case 'P':
       case 'p':
         return handleLowerButtonClick();
+      case 'S':
+      case 's':
+        return toggleSettingModal((isModalOpen) => !isModalOpen);
       default:
     }
   };

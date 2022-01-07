@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useContext, useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import loadable from '@loadable/component';
+
+import StatusContext from '@contexts/status';
 
 import Room from '@layouts/Room';
 
@@ -11,6 +13,15 @@ const Game = loadable(() => import('@pages/GameRoom'));
 const Full = loadable(() => import('@pages/FullRoom'));
 
 const App = () => {
+  const {
+    actions: { setDirection },
+  } = useContext(StatusContext);
+
+  useEffect(() => {
+    const direction = localStorage.getItem('direction') || -1;
+    setDirection(Number(direction));
+  }, [setDirection]);
+
   return (
     <>
       <Routes>

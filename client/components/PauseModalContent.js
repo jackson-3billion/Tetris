@@ -43,6 +43,9 @@ const Wrapper = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  &:focus {
+    outline: none;
+  }
 `;
 
 const Header = styled.div`

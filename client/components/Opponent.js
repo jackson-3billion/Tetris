@@ -66,6 +66,7 @@ const TetrisWrapper = styled.div`
   width: 50%;
   height: 100%;
   overflow: hidden;
+  pointer-events: none;
 `;
 
 const TetrisGame = styled.div`

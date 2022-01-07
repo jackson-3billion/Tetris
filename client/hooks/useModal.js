@@ -19,7 +19,7 @@ const useModal = ({ closableOverlay, styles } = {}) => {
     );
   };
 
-  return [isModalOpen, openModal, hideModal, ModalContainer];
+  return [isModalOpen, openModal, hideModal, ModalContainer, setIsModalOpen];
 };
 
 export default useModal;
