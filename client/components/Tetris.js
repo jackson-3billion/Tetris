@@ -53,6 +53,7 @@ const Tetris = ({ gameRoomState, setPlaying, setRank, socketRef, sendPortalRef }
   // local-state
   const [isReady, setIsReady] = useState(false); // guest 입장에서 필요 <-> isOpponentReady: host가 필요
   const [finished, setFinished] = useState(false);
+  const [waiting, setWaiting] = useState(false);
   const [pressedSpacebar, setPressedSpacebar] = useState(false);
   const [controllable, setControllable] = useState(true);
 
@@ -89,6 +90,7 @@ const Tetris = ({ gameRoomState, setPlaying, setRank, socketRef, sendPortalRef }
   useEffect(() => {
     if (finished) {
       setFinished(false);
+      setWaiting(true);
       axios
         .post('/players', { nickname, score })
         .then((res) => setRank(res.data.ranking))
@@ -365,7 +367,7 @@ const Tetris = ({ gameRoomState, setPlaying, setRank, socketRef, sendPortalRef }
           <Display title="Nickname">{nickname}</Display>
           <Display title="Level">{level}</Display>
           <Display title="Score">{score}</Display>
-          {!playing && !finished && (
+          {!playing && !finished && !waiting && (
             <UpperButton
               callback={handleUpperButtonClick}
               backgroundColor={getButtonColor()}

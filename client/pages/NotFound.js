@@ -55,7 +55,9 @@ const Box = styled.div`
   border-radius: 10px;
   border: 2px solid white;
   width: 40%;
+  min-width: 640px;
   height: 50%;
+  min-height: 450px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
