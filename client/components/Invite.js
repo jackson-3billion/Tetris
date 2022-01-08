@@ -59,6 +59,10 @@ const Wrapper = styled.div`
   justify-content: center;
   align-items: center;
   flex-direction: column;
+
+  @media all and (max-width: 500px) {
+    width: 0%;
+  }
 `;
 
 const Msg = styled.div`
@@ -67,6 +71,10 @@ const Msg = styled.div`
   text-align: center;
   padding-left: 5rem;
   height: fit-content;
+
+  @media all and (max-width: 500px) {
+    display: none;
+  }
 `;
 
 const InviteButton = styled(Button)``;
@@ -88,5 +96,11 @@ const Buttons = styled.div`
     border-radius: 30px;
     border: 2px solid white;
     font-weight: bold;
+  }
+
+  @media all and (max-width: 500px) {
+    position: absolute;
+    left: 0;
+    top: 0;
   }
 `;
