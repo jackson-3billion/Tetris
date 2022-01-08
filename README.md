@@ -16,9 +16,9 @@ https://react-tetris-retro.netlify.app/
 <img src="https://user-images.githubusercontent.com/38288479/148589684-56e439c1-51b0-4eb4-bd50-f2c0679dfef5.png" />
 
 ## BGM
-- https://www.youtube.com/watch?v=TK4V6vIFPGo
-- https://www.youtube.com/watch?v=ltCULQ-e6tc
-- https://www.youtube.com/watch?v=-q4w17qx6y8
+- [SLOW DANCING IN THE DARK](https://www.youtube.com/watch?v=TK4V6vIFPGo)
+- [Just The Two Of Us](https://www.youtube.com/watch?v=-q4w17qx6y8)
+- [meditaçao](https://www.youtube.com/watch?v=ltCULQ-e6tc)
 
 ## Tech Stack
 
