@@ -28,7 +28,7 @@ const Timer = ({ playing, paused }) => {
   }, [playing, paused]);
 
   useEffect(() => {
-    if (time.sec === 29 || time.sec === 59) {
+    if (time.sec === 30 || (time.sec === 0 && time.min > 0)) {
       setLevel((prevLevel) => prevLevel + 1);
     }
   }, [time, setLevel]);
