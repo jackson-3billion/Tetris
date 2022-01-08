@@ -21,7 +21,7 @@ import PauseModalContent from '@components/PauseModalContent';
 import { ARENA_HEIGHT, ARENA_WIDTH } from '@utils/constants';
 
 const GameRoom = () => {
-  const { state, actions } = useContext(StatusContext);
+  const { actions } = useContext(StatusContext);
   const {
     state: { finalScore: opponentFinalScore },
     actions: oppActions,
@@ -43,24 +43,12 @@ const GameRoom = () => {
   const [isPauseModalOpen, openPauseModal, hidePauseModal, PauseModal] = useModal({ styles: modalStyles });
 
   const [gameRoomState, dispatch] = useReducer(reducer, initialState);
-  const { joined, playing, paused, isGameOver, opponentNickname, isPauser, rank } = gameRoomState;
+  const { joined, playing, paused, isOpponentReady, isGameOver, opponentNickname, isPauser, rank } = gameRoomState;
 
   const handleStateChange = useCallback((k) => (v) => dispatch({ payload: { [k]: v } }), []);
   const handleResume = useCallback(() => socketRef?.current?.emit('resume'), [socketRef]);
-  const handleReplayClick = useCallback(() => socketRef.current?.emit('replay'), [socketRef]);
-  const reset = () =>
-    dispatch({
-      payload: {
-        playing: false,
-        paused: false,
-        isPauser: false,
-        isHost: true,
-        isReady: false,
-        isGameOver: false,
-        opponentNickname: '',
-        rank: null,
-      },
-    });
+  const handleReplayClick = useCallback(() => socketRef?.current?.emit('replay'), [socketRef]);
+  const reset = useCallback(() => dispatch({ payload: { ...initialState, joined: true, isHost: true } }), []);
 
   const activateItem = useCallback((setter, delay) => {
     setter((activated) => {
@@ -87,7 +75,7 @@ const GameRoom = () => {
     socket.on('isTwoPlayer', () => socket.emit('nickname', nickname));
     socket.on('full', () => navigate('/game/full'));
     socket.on('nickname', (opponentNickname) => dispatch({ payload: { opponentNickname } }));
-    socket.on('isReady', (isReady) => dispatch({ payload: { isReady } }));
+    socket.on('isReady', (isOpponentReady) => dispatch({ payload: { isOpponentReady } }));
     socket.on('start', () => dispatch({ payload: { playing: true, isGameOver: false, isWinner: false } }));
     socket.on('paused', (paused) => dispatch({ payload: { paused: !!paused, isPauser: paused === socket.id } }));
     socket.on('opponentFinished', (score) => oopActionsRef.current.setFinalScore(score));
@@ -101,7 +89,6 @@ const GameRoom = () => {
       if (fromOpponent) {
         receivePortalRef.current.addItem(item);
         switch (item.name) {
-          // description 표시
           case 'faster':
             return aRef.setAccel((prevAccel) => prevAccel + 1);
           case 'bomb':
@@ -123,7 +110,6 @@ const GameRoom = () => {
 
       if (!fromOpponent) {
         switch (item.name) {
-          // description 표시 ? opponent 는 안해도 될듯
           case 'bomb':
             return activateItem(oRef.setExplodingPos, 1000);
           case 'catjam':
@@ -136,7 +122,7 @@ const GameRoom = () => {
         }
       }
     });
-  }, [socketRef, gameRoomId, nickname, navigate, activateItem]);
+  }, [socketRef, gameRoomId, nickname, navigate, activateItem, reset]);
 
   useEffect(() => {
     paused ? openPauseModal() : hidePauseModal();
@@ -150,7 +136,7 @@ const GameRoom = () => {
     if (!playing && opponentFinalScore !== -1) {
       dispatch({ payload: { playing: false, isGameOver: true } });
     }
-  }, [playing, opponentFinalScore, nickname, state.score]);
+  }, [playing, opponentFinalScore, nickname]);
 
   useEffect(() => {
     if (opponentNickname) {
@@ -179,7 +165,7 @@ const GameRoom = () => {
                 <ItemSendPortal ref={sendPortalRef} />
                 <ItemReceivePortal ref={receivePortalRef} />
                 <Opponent
-                  isReady={gameRoomState.isReady || playing}
+                  isReady={isOpponentReady || playing}
                   socketRef={socketRef}
                   opponentNickname={opponentNickname}
                 />
@@ -216,7 +202,7 @@ const initialState = {
   paused: false,
   isPauser: false,
   isHost: false,
-  isReady: false,
+  isOpponentReady: false,
   isGameOver: false,
   opponentNickname: '',
   rank: null,
@@ -224,10 +210,6 @@ const initialState = {
 
 const Wrapper = styled.div`
   height: 100%;
-
-  /* @media all and (max-width: 800px) {
-    width: 100%;
-  } */
 `;
 
 const InnerWrapper = styled.div`

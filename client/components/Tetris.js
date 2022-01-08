@@ -38,7 +38,7 @@ import {
 
 const Tetris = ({ gameRoomState, setPlaying, setRank, socketRef, sendPortalRef }) => {
   const { state: nickname } = useLocation();
-  const { playing, paused, isHost, isReady: isOpponentReady, opponentNickname } = gameRoomState;
+  const { playing, paused, isHost, isOpponentReady, opponentNickname } = gameRoomState;
 
   // context
   const {
@@ -54,15 +54,11 @@ const Tetris = ({ gameRoomState, setPlaying, setRank, socketRef, sendPortalRef }
   const [isReady, setIsReady] = useState(false); // guest 입장에서 필요 <-> isOpponentReady: host가 필요
   const [finished, setFinished] = useState(false);
   const [pressedSpacebar, setPressedSpacebar] = useState(false);
+  const [controllable, setControllable] = useState(true);
 
   // custom hooks
   const [player, setPlayer, initPlayer, movePlayer, resetPlayer, rotatePlayer] = usePlayer();
   const [arena, setArena] = useArena(player, resetPlayer);
-  const [dropInterval, setDropInterval, animating, setAnimating, cancelAnimation] = useAnimationFrame(
-    () => drop(),
-    DROP_SLOW,
-    playing,
-  );
 
   // ref
   const focusRef = useRef();
@@ -72,28 +68,38 @@ const Tetris = ({ gameRoomState, setPlaying, setRank, socketRef, sendPortalRef }
   const arrowLeftRef = useRef();
 
   const drop = useCallback(() => {
-    if (!animating) return;
+    if (!playing) return;
     if (checkCollision(arena, player, DOWNWARD)) {
-      // useArena에서 checkCollision return 하도록 바꿔보자
       if (player.pos.y <= 1) {
         socketRef.current.emit('gameover', score);
-        setAnimating(false);
         setPlaying(false);
         setFinished(true);
-        axios
-          .post('/players', { nickname, score })
-          .then((res) => setRank(res.data.ranking))
-          .catch((err) => console.log(err.response.data.msg));
+        setIsReady(false);
         return;
       }
       return setPlayer((prev) => ({ ...prev, collided: true }));
     }
     movePlayer(DOWNWARD);
-  }, [arena, movePlayer, player, setPlayer, setPlaying, setRank, nickname, score, socketRef, animating, setAnimating]);
+  }, [arena, movePlayer, player, setPlayer, playing, setPlaying, score, socketRef]);
+
+  const [dropInterval, setDropInterval, cancelAnimation] = useAnimationFrame(drop, DROP_SLOW, playing);
 
   useEffect(() => focusRef.current.focus());
 
   useEffect(() => {
+    if (finished) {
+      setFinished(false);
+      axios
+        .post('/players', { nickname, score })
+        .then((res) => setRank(res.data.ranking))
+        .catch((err) => console.log(err.response.data.msg));
+    }
+  }, [finished, nickname, score, setRank]);
+
+  useEffect(() => {
+    if (!opponentNickname) {
+      setIsReady(false);
+    }
     initPlayer();
     setArena(createArena());
   }, [opponentNickname, setArena, initPlayer]);
@@ -108,7 +114,6 @@ const Tetris = ({ gameRoomState, setPlaying, setRank, socketRef, sendPortalRef }
       const q = Math.floor((newInterval - MIN_INTERVAL) / 50);
       newInterval -= Math.min(q, accel) * 50;
     }
-
     if (newInterval >= MIN_INTERVAL) {
       setDropInterval((prevInterval) => {
         if (prevInterval === DROP_FAST) {
@@ -123,18 +128,15 @@ const Tetris = ({ gameRoomState, setPlaying, setRank, socketRef, sendPortalRef }
 
   //  hook 으로 분리해보자
   useEffect(() => {
+    if (explodingPos) {
+      return setControllable(false);
+    }
     if (!explodingPos) {
       setArena((prevArena) =>
         prevArena.map((row) => row.map((cell) => (cell[2]?.name === 'fire' ? ['0', 'A'] : cell))),
       );
-      return setDropInterval(newIntervalRef.current);
+      return setControllable(true);
     }
-    setDropInterval((prevInterval) => {
-      if (prevInterval !== DROP_FAST) {
-        newIntervalRef.current = prevInterval;
-      }
-      return DROP_PAUSED;
-    });
   }, [explodingPos, setDropInterval, setArena]);
 
   // 게임 시작 및 재시작
@@ -142,9 +144,8 @@ const Tetris = ({ gameRoomState, setPlaying, setRank, socketRef, sendPortalRef }
     if (playing) {
       setArena(createArena());
       resetPlayer();
-      setAnimating(true);
     }
-  }, [playing, setArena, resetPlayer, setAnimating]);
+  }, [playing, setArena, resetPlayer]);
 
   useEffect(() => {
     if (!playing) return;
@@ -223,6 +224,7 @@ const Tetris = ({ gameRoomState, setPlaying, setRank, socketRef, sendPortalRef }
       const item = items.pop();
       switch (item.name) {
         case 'star': // 자신에게 적용되는 아이템
+          setControllable(false);
           setArena((prevArena) => {
             const newArena = prevArena.map((row) => row);
             for (let i = 0; i < prevArena[0].length; i++) {
@@ -235,6 +237,7 @@ const Tetris = ({ gameRoomState, setPlaying, setRank, socketRef, sendPortalRef }
           });
           return setTimeout(() => {
             removeOneRow(setArena, player);
+            setControllable(true);
           }, 500);
         case 'slower': // 자신에게 적용되는 아이템
           return setAccel((accel) => accel - 1);
@@ -306,13 +309,16 @@ const Tetris = ({ gameRoomState, setPlaying, setRank, socketRef, sendPortalRef }
   }, []);
 
   const handleKeyDown = ({ key, repeat }) => {
+    if (!controllable) return;
     if (key !== 'S' && key !== 's' && (!playing || paused)) return;
     switch (key) {
       case 'ArrowLeft':
         if (checkCollision(arena, player, LEFTWARD) || player.collided) return;
+        if (dropInterval === DROP_FAST) setDropInterval(newIntervalRef.current);
         return repeat ? handleKeyHold(movePlayer, LEFTWARD) : movePlayer(LEFTWARD);
       case 'ArrowRight':
         if (checkCollision(arena, player, RIGHTWARD) || player.collided) return;
+        if (dropInterval === DROP_FAST) setDropInterval(newIntervalRef.current);
         return repeat ? handleKeyHold(movePlayer, RIGHTWARD) : movePlayer(RIGHTWARD);
       case 'ArrowDown':
         if (dropInterval !== DROP_FAST) {
@@ -323,7 +329,7 @@ const Tetris = ({ gameRoomState, setPlaying, setRank, socketRef, sendPortalRef }
             return DROP_FAST;
           });
         }
-        break;
+        return;
       case 'ArrowUp':
         return rotatePlayer(arena);
       case 'Spacebar':

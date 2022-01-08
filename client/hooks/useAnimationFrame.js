@@ -2,10 +2,10 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 
 const useAnimationFrame = (callback, delay, started) => {
   const [interval, setInterval] = useState(delay);
-  const [playing, setPlaying] = useState(started);
   const timeRef = useRef(0);
   const counterRef = useRef(0);
   const savedCallbackRef = useRef();
+  const playingRef = useRef(started); // request가 종료되지 않는 버그때문에 update 함수 종료를 위해 추가
   const requestIdRef = useRef();
   const cancelAnimation = useCallback(() => cancelAnimationFrame(requestIdRef.current), []);
 
@@ -14,17 +14,11 @@ const useAnimationFrame = (callback, delay, started) => {
   }, [callback]);
 
   useEffect(() => {
-    // 가끔씩 clean-up 함수가 정상적으로 cancelAnimationFrame을 못하는 버그가 있음.
-    cancelAnimationFrame(requestIdRef.current);
-    if (!playing) {
-      cancelAnimationFrame(requestIdRef.current);
-      return () => cancelAnimationFrame(requestIdRef.current);
-    }
+    playingRef.current = started;
+    if (!started) return;
 
     const update = (time = 0) => {
-      if (!playing) {
-        return cancelAnimationFrame(requestIdRef.current);
-      }
+      if (!playingRef.current) return;
       const timeDiff = time - timeRef.current;
       counterRef.current += timeDiff;
       timeRef.current = time;
@@ -33,16 +27,15 @@ const useAnimationFrame = (callback, delay, started) => {
         savedCallbackRef.current();
         counterRef.current = 0;
       }
-      cancelAnimationFrame(requestIdRef.current);
       requestIdRef.current = requestAnimationFrame(update);
     };
 
     update();
 
     return () => cancelAnimationFrame(requestIdRef.current);
-  }, [interval, playing]);
+  }, [interval, started]);
 
-  return [interval, setInterval, playing, setPlaying, cancelAnimation];
+  return [interval, setInterval, cancelAnimation];
 };
 
 export default useAnimationFrame;
