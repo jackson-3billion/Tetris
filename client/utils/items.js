@@ -4,7 +4,7 @@ import { IoLogoOctocat } from 'react-icons/io';
 import { GrRotateLeft } from 'react-icons/gr';
 import { MdFlip } from 'react-icons/md';
 
-const ITEM_CHANCE = 0.2;
+const ITEM_CHANCE = 5;
 const ITEMS = [
   {
     name: 'bomb',
@@ -37,7 +37,7 @@ const ITEMS = [
 ];
 
 export const getRandomItem = () => {
-  if (Math.floor(Math.random() * 10) > ITEM_CHANCE) {
+  if (Math.floor(Math.random() * 10) >= ITEM_CHANCE) {
     return ITEMS[Math.floor(Math.random() * ITEMS.length)];
   }
 };
