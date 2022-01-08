@@ -29,4 +29,4 @@ https://react-tetris-retro.netlify.app/
 <img src="https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white" />&nbsp;<img src="https://img.shields.io/badge/MySQL-005C84?style=for-the-badge&logo=mysql&logoColor=white" />&nbsp;<img src="https://img.shields.io/badge/Socket.io-010101?&style=for-the-badge&logo=Socket.io&logoColor=white" />&nbsp;<img src="https://img.shields.io/badge/Heroku-430098?style=for-the-badge&logo=heroku&logoColor=white" />
 
 ## WiKi
-https://github.com/jch422/Tetris/wiki
+[Check WIKI 😋](https://github.com/jch422/Tetris/wiki)
