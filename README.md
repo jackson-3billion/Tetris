@@ -10,7 +10,7 @@ https://react-tetris-retro.netlify.app/
 ⏮️    내 블록 낙하 속도가 느려집니다.  
 🐱    상대 Arena에 고양이가 출몰합니다.  
 🔄    상대 Arena의 위 아래가 바뀌게 됩니다.  
-<img width="22" height="20" src="https://user-images.githubusercontent.com/38288479/148589234-e40a3e50-9b62-4347-9f00-850c0dbd4b2e.png" />  상대 Arena의 좌우가 대칭됩니다.  
+<img width="22" height="20" src="https://user-images.githubusercontent.com/38288479/148589234-e40a3e50-9b62-4347-9f00-850c0dbd4b2e.png" />  상대 Arena의 좌우가 바뀌게 됩니다.  
 
 ## Control
 <img src="https://user-images.githubusercontent.com/38288479/148589684-56e439c1-51b0-4eb4-bd50-f2c0679dfef5.png" />
