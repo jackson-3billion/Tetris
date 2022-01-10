@@ -117,14 +117,15 @@ const Tetris = ({ gameRoomState, setPlaying, setRank, socketRef, sendPortalRef }
       newInterval -= Math.min(q, accel) * 50;
     }
     if (newInterval >= MIN_INTERVAL) {
-      setDropInterval((prevInterval) => {
-        if (prevInterval === DROP_FAST) {
-          // 아래방향키 누르고 있는 중일때는 dropInterval 바꾸지 않는다.
-          newIntervalRef.current = newInterval;
-          return prevInterval;
-        }
-        return newInterval;
-      });
+      setDropInterval(newInterval);
+      // setDropInterval((prevInterval) => {
+      //   if (prevInterval === DROP_FAST) {
+      //     // 아래방향키 누르고 있는 중일때는 dropInterval 바꾸지 않는다.
+      //     newIntervalRef.current = newInterval;
+      //     return prevInterval;
+      //   }
+      //   return newInterval;
+      // });
     }
   }, [level, accel, setDropInterval]);
 
@@ -139,7 +140,7 @@ const Tetris = ({ gameRoomState, setPlaying, setRank, socketRef, sendPortalRef }
       );
       return setControllable(true);
     }
-  }, [explodingPos, setDropInterval, setArena]);
+  }, [explodingPos, setArena]);
 
   // 게임 시작 및 재시작
   useEffect(() => {
@@ -152,18 +153,19 @@ const Tetris = ({ gameRoomState, setPlaying, setRank, socketRef, sendPortalRef }
   useEffect(() => {
     if (!playing) return;
     if (paused) {
-      cancelAnimation();
+      // cancelAnimation();
       setDropInterval((prevInterval) => {
-        if (prevInterval !== DROP_FAST) {
-          newIntervalRef.current = prevInterval;
-        }
+        newIntervalRef.current = prevInterval;
+        // if (prevInterval !== DROP_FAST) {
+        //   newIntervalRef.current = prevInterval;
+        // }
         return DROP_PAUSED;
       });
     }
     if (!paused) {
       setDropInterval(newIntervalRef.current);
     }
-  }, [paused, playing, setDropInterval, cancelAnimation]);
+  }, [paused, playing, setDropInterval]);
 
   // 사용자의 화면 변경사항을 상대에게 전송
   useEffect(() => {
@@ -210,13 +212,14 @@ const Tetris = ({ gameRoomState, setPlaying, setRank, socketRef, sendPortalRef }
     socket.emit('preview-updated', player.next.preview);
   }, [player.next, socketRef]);
 
-  useEffect(() => {
-    arrowLeftRef.current.dispatchEvent(
-      new KeyboardEvent('keydown', {
-        key: 'ArrowLeft',
-      }),
-    );
-  }, []);
+  // TODO: 모바일 버튼 구현(진행중)
+  // useEffect(() => {
+  //   arrowLeftRef.current.dispatchEvent(
+  //     new KeyboardEvent('keydown', {
+  //       key: 'ArrowLeft',
+  //     }),
+  //   );
+  // }, []);
 
   useEffect(() => {
     const socket = socketRef.current;
@@ -293,15 +296,15 @@ const Tetris = ({ gameRoomState, setPlaying, setRank, socketRef, sendPortalRef }
     }
   }, [paused, socketRef]);
 
-  const handleKeyUp = useCallback(
-    ({ key }) => {
-      if (key !== 'ArrowDown') return;
-      if (!playing || paused) return;
-      cancelAnimation();
-      setDropInterval(newIntervalRef.current);
-    },
-    [playing, paused, cancelAnimation, setDropInterval],
-  );
+  // const handleKeyUp = useCallback(
+  //   ({ key }) => {
+  //     if (key !== 'ArrowDown') return;
+  //     if (!playing || paused) return;
+  //     cancelAnimation();
+  //     setDropInterval(newIntervalRef.current);
+  //   },
+  //   [playing, paused, cancelAnimation, setDropInterval],
+  // );
 
   const handleKeyHold = useCallback((callback, args) => {
     if (++keyHoldCounterRef.current >= KEYHOLD_MAX_CNT) {
@@ -316,22 +319,23 @@ const Tetris = ({ gameRoomState, setPlaying, setRank, socketRef, sendPortalRef }
     switch (key) {
       case 'ArrowLeft':
         if (checkCollision(arena, player, LEFTWARD) || player.collided) return;
-        if (dropInterval === DROP_FAST) setDropInterval(newIntervalRef.current);
+        //if (dropInterval === DROP_FAST) setDropInterval(newIntervalRef.current);
         return repeat ? handleKeyHold(movePlayer, LEFTWARD) : movePlayer(LEFTWARD);
       case 'ArrowRight':
         if (checkCollision(arena, player, RIGHTWARD) || player.collided) return;
-        if (dropInterval === DROP_FAST) setDropInterval(newIntervalRef.current);
+        //if (dropInterval === DROP_FAST) setDropInterval(newIntervalRef.current);
         return repeat ? handleKeyHold(movePlayer, RIGHTWARD) : movePlayer(RIGHTWARD);
       case 'ArrowDown':
-        if (dropInterval !== DROP_FAST) {
-          setDropInterval((prevInterval) => {
-            if (prevInterval !== DROP_FAST) {
-              newIntervalRef.current = prevInterval;
-            }
-            return DROP_FAST;
-          });
-        }
-        return;
+        return repeat ? handleKeyHold(drop) : drop();
+      // if (dropInterval !== DROP_FAST) {
+      //   setDropInterval((prevInterval) => {
+      //     if (prevInterval !== DROP_FAST) {
+      //       newIntervalRef.current = prevInterval;
+      //     }
+      //     return DROP_FAST;
+      //   });
+      // }
+      // return;
       case 'ArrowUp':
         return rotatePlayer(arena);
       case 'Spacebar':
@@ -357,7 +361,7 @@ const Tetris = ({ gameRoomState, setPlaying, setRank, socketRef, sendPortalRef }
   };
 
   return (
-    <TetrisWrapper ref={focusRef} role="button" tabIndex="0" onKeyDown={handleKeyDown} onKeyUp={handleKeyUp}>
+    <TetrisWrapper ref={focusRef} role="button" tabIndex="0" onKeyDown={handleKeyDown}>
       <TetrisGame>
         <Arena arena={arena} {...state} isReady={isReady || (isOpponentReady && playing)} />
         <aside>
