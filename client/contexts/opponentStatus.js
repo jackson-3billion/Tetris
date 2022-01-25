@@ -22,6 +22,7 @@ const OpponentStatusContext = createContext({
     setRotated: () => {},
     setFlipped: () => {},
     setPreview: () => {},
+    resetStatus: () => {},
   },
 });
 
@@ -35,7 +36,7 @@ const OpponentStatusProvider = ({ children }) => {
   const [flipped, setFlipped] = useState(false);
   const [preview, setPreview] = useState(TETROMINOS[0].preview);
 
-  const resetOpponentStatus = useCallback(() => {
+  const resetStatus = useCallback(() => {
     setLevel(1);
     setScore(0);
     setFinalScore(-1);
@@ -57,7 +58,7 @@ const OpponentStatusProvider = ({ children }) => {
       setRotated,
       setFlipped,
       setPreview,
-      resetOpponentStatus,
+      resetStatus,
     },
   };
 

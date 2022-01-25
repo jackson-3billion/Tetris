@@ -21,8 +21,8 @@ const StatusContext = createContext({
     setCatJamming: () => {},
     setRotated: () => {},
     setFlipped: () => {},
-    resetStatus: () => {},
     setDirection: () => {},
+    resetStatus: () => {},
   },
 });
 
@@ -59,8 +59,8 @@ const StatusProvider = ({ children }) => {
       setCatJamming,
       setRotated,
       setFlipped,
-      resetStatus,
       setDirection,
+      resetStatus,
     },
   };
 
