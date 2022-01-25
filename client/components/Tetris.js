@@ -25,16 +25,7 @@ import CatJamGif from '@components/CatJam';
 
 import colors from '@utils/colors';
 import { createArena, checkCollision, removeOneRow } from '@utils/gameHelper';
-import {
-  DROP_FAST,
-  DROP_SLOW,
-  DROP_PAUSED,
-  MIN_INTERVAL,
-  LEFTWARD,
-  RIGHTWARD,
-  DOWNWARD,
-  KEYHOLD_MAX_CNT,
-} from '@utils/constants';
+import { DROP_SLOW, DROP_PAUSED, MIN_INTERVAL, LEFTWARD, RIGHTWARD, DOWNWARD, KEYHOLD_MAX_CNT } from '@utils/constants';
 
 const Tetris = ({ gameRoomState, setPlaying, setRank, socketRef, sendPortalRef }) => {
   const { state: nickname } = useLocation();
@@ -66,7 +57,6 @@ const Tetris = ({ gameRoomState, setPlaying, setRank, socketRef, sendPortalRef }
   const newIntervalRef = useRef(DROP_SLOW);
   const keyHoldCounterRef = useRef(0);
   const catJamBgmRef = useRef(new Audio('../bgms/cat-jam.mp3'));
-  const arrowLeftRef = useRef();
 
   const drop = useCallback(() => {
     if (!playing) return;
@@ -83,10 +73,11 @@ const Tetris = ({ gameRoomState, setPlaying, setRank, socketRef, sendPortalRef }
     movePlayer(DOWNWARD);
   }, [arena, movePlayer, player, setPlayer, playing, setPlaying, score, socketRef]);
 
-  const [dropInterval, setDropInterval, cancelAnimation] = useAnimationFrame(drop, DROP_SLOW, playing);
+  const [dropInterval, setDropInterval] = useAnimationFrame(drop, DROP_SLOW, playing);
 
   useEffect(() => focusRef.current.focus());
 
+  // DB에 score 저장
   useEffect(() => {
     if (finished) {
       setFinished(false);
@@ -98,6 +89,7 @@ const Tetris = ({ gameRoomState, setPlaying, setRank, socketRef, sendPortalRef }
     }
   }, [finished, nickname, score, setRank]);
 
+  // Arena 초기화
   useEffect(() => {
     if (!opponentNickname) {
       setIsReady(false);
@@ -106,7 +98,7 @@ const Tetris = ({ gameRoomState, setPlaying, setRank, socketRef, sendPortalRef }
     setArena(createArena());
   }, [opponentNickname, setArena, initPlayer]);
 
-  // hook으로 빼낼 수 있을 듯
+  // 레벨에 따라 drop 속도 계산
   useEffect(() => {
     let newInterval = DROP_SLOW - (level - 1) * 50;
     if (accel < 0) {
@@ -118,18 +110,9 @@ const Tetris = ({ gameRoomState, setPlaying, setRank, socketRef, sendPortalRef }
     }
     if (newInterval >= MIN_INTERVAL) {
       setDropInterval(newInterval);
-      // setDropInterval((prevInterval) => {
-      //   if (prevInterval === DROP_FAST) {
-      //     // 아래방향키 누르고 있는 중일때는 dropInterval 바꾸지 않는다.
-      //     newIntervalRef.current = newInterval;
-      //     return prevInterval;
-      //   }
-      //   return newInterval;
-      // });
     }
   }, [level, accel, setDropInterval]);
 
-  //  hook 으로 분리해보자
   useEffect(() => {
     if (explodingPos) {
       return setControllable(false);
@@ -150,15 +133,12 @@ const Tetris = ({ gameRoomState, setPlaying, setRank, socketRef, sendPortalRef }
     }
   }, [playing, setArena, resetPlayer]);
 
+  // 게임 일시정지
   useEffect(() => {
     if (!playing) return;
     if (paused) {
-      // cancelAnimation();
       setDropInterval((prevInterval) => {
         newIntervalRef.current = prevInterval;
-        // if (prevInterval !== DROP_FAST) {
-        //   newIntervalRef.current = prevInterval;
-        // }
         return DROP_PAUSED;
       });
     }
@@ -211,15 +191,6 @@ const Tetris = ({ gameRoomState, setPlaying, setRank, socketRef, sendPortalRef }
     const socket = socketRef.current;
     socket.emit('preview-updated', player.next.preview);
   }, [player.next, socketRef]);
-
-  // TODO: 모바일 버튼 구현(진행중)
-  // useEffect(() => {
-  //   arrowLeftRef.current.dispatchEvent(
-  //     new KeyboardEvent('keydown', {
-  //       key: 'ArrowLeft',
-  //     }),
-  //   );
-  // }, []);
 
   useEffect(() => {
     const socket = socketRef.current;
@@ -296,16 +267,6 @@ const Tetris = ({ gameRoomState, setPlaying, setRank, socketRef, sendPortalRef }
     }
   }, [paused, socketRef]);
 
-  // const handleKeyUp = useCallback(
-  //   ({ key }) => {
-  //     if (key !== 'ArrowDown') return;
-  //     if (!playing || paused) return;
-  //     cancelAnimation();
-  //     setDropInterval(newIntervalRef.current);
-  //   },
-  //   [playing, paused, cancelAnimation, setDropInterval],
-  // );
-
   const handleKeyHold = useCallback((callback, args) => {
     if (++keyHoldCounterRef.current >= KEYHOLD_MAX_CNT) {
       callback(args);
@@ -319,23 +280,12 @@ const Tetris = ({ gameRoomState, setPlaying, setRank, socketRef, sendPortalRef }
     switch (key) {
       case 'ArrowLeft':
         if (checkCollision(arena, player, LEFTWARD) || player.collided) return;
-        //if (dropInterval === DROP_FAST) setDropInterval(newIntervalRef.current);
         return repeat ? handleKeyHold(movePlayer, LEFTWARD) : movePlayer(LEFTWARD);
       case 'ArrowRight':
         if (checkCollision(arena, player, RIGHTWARD) || player.collided) return;
-        //if (dropInterval === DROP_FAST) setDropInterval(newIntervalRef.current);
         return repeat ? handleKeyHold(movePlayer, RIGHTWARD) : movePlayer(RIGHTWARD);
       case 'ArrowDown':
         return repeat ? handleKeyHold(drop) : drop();
-      // if (dropInterval !== DROP_FAST) {
-      //   setDropInterval((prevInterval) => {
-      //     if (prevInterval !== DROP_FAST) {
-      //       newIntervalRef.current = prevInterval;
-      //     }
-      //     return DROP_FAST;
-      //   });
-      // }
-      // return;
       case 'ArrowUp':
         return rotatePlayer(arena);
       case 'Spacebar':
@@ -387,19 +337,19 @@ const Tetris = ({ gameRoomState, setPlaying, setRank, socketRef, sendPortalRef }
           )}
         </aside>
         <MobileButtons>
-          <span ref={arrowLeftRef}>
+          <span onClick={() => handleKeyDown({ key: 'ArrowLeft' })}>
             <BsFillArrowLeftCircleFill size="50px" color="#B0A8B9" />
           </span>
-          <span>
+          <span onClick={() => handleKeyDown({ key: 'ArrowDown' })}>
             <BsFillArrowDownCircleFill size="50px" color="#B0A8B9" />
           </span>
-          <span>
+          <span onClick={() => handleKeyDown({ key: 'ArrowRight' })}>
             <BsFillArrowRightCircleFill size="50px" color="#B0A8B9" />
           </span>
-          <span>
+          <span onClick={() => handleKeyDown({ key: 'ArrowUp' })}>
             <BsFillArrowUpCircleFill size="50px" color="#B0A8B9" />
           </span>
-          <span>
+          <span onClick={() => handleKeyDown({ key: 'Spacebar' })}>
             <span>Drop</span>
           </span>
         </MobileButtons>
@@ -471,6 +421,9 @@ const LowerButton = styled(Button)`
 const MobileButtons = styled.div`
   @media all and (min-width: 501px) {
     display: none;
+  }
+  &:hover {
+    cursor: pointer;
   }
   & > span {
     position: absolute;

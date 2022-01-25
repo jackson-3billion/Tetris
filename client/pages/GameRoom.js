@@ -28,7 +28,7 @@ const GameRoom = () => {
   } = useContext(OpponentStatusContext);
 
   const actionsRef = useRef(actions);
-  const oopActionsRef = useRef(oppActions);
+  const oppActionsRef = useRef(oppActions);
 
   const navigate = useNavigate();
   const { id: gameRoomId } = useParams();
@@ -48,7 +48,7 @@ const GameRoom = () => {
   const handleStateChange = useCallback((k) => (v) => dispatch({ payload: { [k]: v } }), []);
   const handleResume = useCallback(() => socketRef?.current?.emit('resume'), [socketRef]);
   const handleReplayClick = useCallback(() => socketRef?.current?.emit('replay'), [socketRef]);
-  const reset = useCallback(() => dispatch({ payload: { ...initialState, joined: true, isHost: true } }), []);
+  const reset = useCallback((isHost) => dispatch({ payload: { ...initialState, joined: false, isHost } }), []);
 
   const activateItem = useCallback((setter, delay) => {
     setter((activated) => {
@@ -78,9 +78,32 @@ const GameRoom = () => {
     socket.on('isReady', (isOpponentReady) => dispatch({ payload: { isOpponentReady } }));
     socket.on('start', () => dispatch({ payload: { playing: true, isGameOver: false, isWinner: false } }));
     socket.on('paused', (paused) => dispatch({ payload: { paused: !!paused, isPauser: paused === socket.id } }));
-    socket.on('opponentFinished', (score) => oopActionsRef.current.setFinalScore(score));
-    socket.on('replay', () => window.location.reload());
-    socket.on('opponentLeft', reset);
+    socket.on('opponentFinished', (score) => oppActionsRef.current.setFinalScore(score));
+    socket.on('opponentLeft', () => {
+      reset(true);
+      actionsRef.current.resetStatus();
+      oppActionsRef.current.resetStatus();
+      setTimeout(() => dispatch({ payload: { joined: true } }), 100);
+    });
+    socket.on('replay', (id) => {
+      if (id !== socket.id) {
+        return;
+      }
+      dispatch({
+        payload: {
+          joined: false,
+          playing: false,
+          paused: false,
+          isPauser: false,
+          isOpponentReady: false,
+          isGameOver: false,
+          rank: null,
+        },
+      });
+      actionsRef.current.resetStatus();
+      oppActionsRef.current.resetStatus();
+      setTimeout(() => dispatch({ payload: { joined: true } }), 100);
+    });
 
     socket.on('item', (item) => {
       const fromOpponent = item.sender !== socket.id;
@@ -106,7 +129,7 @@ const GameRoom = () => {
         }
       }
 
-      const oRef = oopActionsRef.current;
+      const oRef = oppActionsRef.current;
 
       if (!fromOpponent) {
         switch (item.name) {
@@ -141,7 +164,7 @@ const GameRoom = () => {
   useEffect(() => {
     if (opponentNickname) {
       actionsRef.current.resetStatus();
-      oopActionsRef.current.resetOpponentStatus();
+      oppActionsRef.current.resetStatus();
     }
   }, [opponentNickname]);
 

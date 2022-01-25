@@ -67,7 +67,7 @@ io.on('connection', socket => {
 
     socket.on('gameover', score => socket.broadcast.to(gameRoomId).emit('opponentFinished', score));
 
-    socket.on('replay', () => io.to(gameRoomId).emit('replay'));
+    socket.on('replay', () => io.to(gameRoomId).emit('replay', socket.id));
 
     socket.on('disconnect', () => {
       socket.leave(gameRoomId);
